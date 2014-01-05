@@ -5,9 +5,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
     <title>IMO 1979 Problem 3</title>
-    <!--<script src="../../lib/closure-library/closure/goog/base.js"></script>
-    <script src="code.js"></script>-->
-        <script src="compiled.js"></script>
+    <script src="../../lib/closure-library/closure/goog/base.js"></script>
+    <script src="code.js"></script>
+    <!--<script src="compiled.js"></script>-->
     <style>
         .goog-slider-horizontal {
             background-color: ThreeDFace;
@@ -46,30 +46,32 @@
     </style>
 </head>
 <body>
-    <div id="inner" style="overflow: hidden; width: 800px;">
-        <div id="s-h" style="float: left; margin-left: 10px">
-            <strong>r (R1/R2)</strong>
-            <div id="s1" class="goog-slider" style="width: 200px; height: 20px">
-                <div style="position:absolute;width:100%;top:9px;border:1px inset white;overflow:hidden;height:0"></div>
-                <div class="goog-slider-thumb"></div>
+    <div id="container" style="overflow: hidden">
+        <div id="inner" style="overflow: hidden; width: 800px;">
+            <div id="s-h" style="float: left; margin-left: 10px">
+                <strong>r (R1/R2)</strong>
+                <div id="s1" class="goog-slider" style="width: 200px; height: 20px">
+                    <div style="position:absolute;width:100%;top:9px;border:1px inset white;overflow:hidden;height:0"></div>
+                    <div class="goog-slider-thumb"></div>
+                </div>
+                <input type="text" value="0" id="out1" style="margin-left: 0px; margin-top: 5px" readonly>
             </div>
-            <input type="text" value="0" id="out1" style="margin-left: 0px; margin-top: 5px">
-        </div>
-        <div id="s-h" style="float: left; margin-left: 10px">
-            <strong>q [R1 - R2, R1 + R2]</strong>
-            <div id="s2" class="goog-slider" style="width: 200px; height: 20px">
-                <div style="position:absolute;width:100%;top:9px;border:1px inset white;overflow:hidden;height:0"></div>
-                <div class="goog-slider-thumb"></div>
+            <div id="s-h" style="float: left; margin-left: 10px">
+                <strong>q [R1 - R2, R1 + R2]</strong>
+                <div id="s2" class="goog-slider" style="width: 200px; height: 20px">
+                    <div style="position:absolute;width:100%;top:9px;border:1px inset white;overflow:hidden;height:0"></div>
+                    <div class="goog-slider-thumb"></div>
+                </div>
+                <input type="text" value="0" id="out2" style="margin-left: 0px; margin-top: 5px" readonly>
             </div>
-            <input type="text" value="0" id="out2" style="margin-left: 0px; margin-top: 5px">
+            <div id="s-h" style="float: left; margin-left: 10px">
+                <input type="checkbox" onclick="imo_1979_3.onChangeDirection(this.checked)">
+                Inverse direction
+            </div>
         </div>
-        <div id="s-h" style="float: left; margin-left: 10px">
-            <input type="checkbox" onclick="imo_1979_3.onChangeDirection(this.checked)">
-            Inverse direction
+        <div style="text-align: left;">
+            <canvas height="400" id="canvas" width="600"> </canvas>
         </div>
-    </div>
-    <div style="text-align: left;">
-        <canvas height="400" id="canvas" width="600"> </canvas>
     </div>
     <script>
         imo_1979_3.start();

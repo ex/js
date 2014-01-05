@@ -115,11 +115,13 @@ imo_1979_3.start = function () {
     s1.addEventListener(goog.ui.Component.EventType.CHANGE, function () {
         onRadiusChange(s1.getValue() / 100);
     });
+    s1.setMoveToPointEnabled(true);
     s1.setValue(100 * r);
 
     var e2 = document.getElementById('s2');
     var s2 = new goog.ui.Slider;
     s2.decorate(e2);
+    s2.setMoveToPointEnabled(true);
     s2.addEventListener(goog.ui.Component.EventType.CHANGE, function () {
         onCenterChange(s2.getValue() / 100);
     });
