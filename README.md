@@ -1,4 +1,2 @@
-js
-==
 
 JavaScript playground
