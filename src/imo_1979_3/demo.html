@@ -31,15 +31,6 @@
             background-color: lightgray;
         }
 
-        #s-h {
-            margin-bottom: 2em;
-        }
-
-        strong {
-            display: block;
-            margin-bottom: 3px;
-        }
-
         canvas {
             -webkit-tap-highlight-color: rgba(0,0,0,0);
         }
@@ -47,24 +38,29 @@
 </head>
 <body>
     <div id="container" style="overflow: hidden">
-        <div id="inner" style="overflow: hidden; width: 800px;">
-            <div id="s-h" style="float: left; margin-left: 10px">
-                <strong>r (R1/R2)</strong>
+        <div id="inner" style="overflow: hidden; width: 900px;">
+            <div style="float: left; margin-left: 10px; margin-bottom: 5px">
+                <strong style="display: block; margin-bottom: 3px">r (R1/R2)</strong>
                 <div id="s1" class="goog-slider" style="width: 200px; height: 20px">
                     <div style="position:absolute;width:100%;top:9px;border:1px inset white;overflow:hidden;height:0"></div>
                     <div class="goog-slider-thumb"></div>
                 </div>
                 <input type="text" value="0" id="out1" style="margin-left: 0px; margin-top: 5px" readonly>
             </div>
-            <div id="s-h" style="float: left; margin-left: 10px">
-                <strong>q [R1 - R2, R1 + R2]</strong>
+            <div style="float: left; margin-left: 10px; margin-bottom: 5px">
+                <strong style="display: block; margin-bottom: 3px">q [R1 - R2, R1 + R2]</strong>
                 <div id="s2" class="goog-slider" style="width: 200px; height: 20px">
                     <div style="position:absolute;width:100%;top:9px;border:1px inset white;overflow:hidden;height:0"></div>
                     <div class="goog-slider-thumb"></div>
                 </div>
                 <input type="text" value="0" id="out2" style="margin-left: 0px; margin-top: 5px" readonly>
             </div>
-            <div id="s-h" style="float: left; margin-left: 10px">
+            <div style="float: left; margin-left: 10px; margin-bottom: 5px">
+                <strong style="display: block; margin-bottom: 3px">Move</strong>
+                <div id="s3" class="goog-slider" style="width: 200px; height: 20px">
+                    <div style="position:absolute;width:100%;top:9px;border:1px inset white;overflow:hidden;height:0"></div>
+                    <div class="goog-slider-thumb"></div>
+                </div>
                 <input type="checkbox" onclick="imo_1979_3.onChangeDirection(this.checked)">
                 Inverse direction
             </div>
