@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <title>Draw tweet</title>
+    <script src="../../lib/closure-library/closure/goog/base.js"></script>
+    <script src="code.js"></script>
+    <!--<script src="compiled.js"></script>-->
+    <style>
+        canvas {
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+        }
+    </style>
+</head>
+<body>
+    <div id="container" style="overflow: hidden">
+        <div style="text-align: left;">
+            <canvas id="canvas" height="512" width="512"> </canvas>
+        </div>
+    </div>
+    <script>
+        DrawTweet.start();
+    </script>
+</body>
+</html>
