@@ -9,17 +9,43 @@
     <script src="code.js"></script>
     <!--<script src="compiled.js"></script>-->
     <style>
-        canvas {
-            -webkit-tap-highlight-color: rgba(0,0,0,0);
-        }
-    </style>
+      textarea {
+        width: 640px;
+        height: 100px;
+        padding: 2px;
+        overflow: auto;
+        font-family: monospace;
+        font-size: small;
+      }
+    </style>  
+    <link rel="stylesheet" href="../../lib/closure-library/closure/goog/css/common.css">
+    <link rel="stylesheet" href="../../lib/closure-library/closure/goog/css/menubutton.css">
+    <link rel="stylesheet" href="../../lib/closure-library/closure/goog/css/menu.css">
+    <link rel="stylesheet" href="../../lib/closure-library/closure/goog/css/menuitem.css">
 </head>
 <body>
-    <div id="container" style="overflow: hidden">
-        <div style="text-align: left;">
-            <canvas id="canvas" height="512" width="512"> </canvas>
+    <fieldset>
+        <legend>Tweetable Mathematical Art</legend>
+        <label id="selectEquations">&nbsp;&nbsp;Choose equations:&nbsp;&nbsp;</label>
+        <br />
+        <div id="container" style="overflow: hidden">
+            <div style="text-align: left;">
+                <canvas id="canvas" height="512" width="512"></canvas>
+            </div>
         </div>
-    </div>
+        <div style="overflow: hidden">
+            Red:<br />
+            <textarea id="textRed" wrap="off"></textarea>
+        </div>
+        <div style="overflow: hidden">
+            Green:<br />
+            <textarea id="textGreen" wrap="off"></textarea>
+        </div>
+        <div style="overflow: hidden">
+            Blue:<br />
+            <textarea id="textBlue" wrap="off"></textarea>
+        </div>
+    </fieldset>
     <script>
         DrawTweet.start();
     </script>
