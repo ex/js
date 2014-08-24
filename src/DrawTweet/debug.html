@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <title>Draw tweet</title>
+    <style>
+
+        .goog-inline-block {
+            position: relative;
+            display: -moz-inline-box; /* Ignored by FF3 and later. */
+            display: inline-block;
+        }
+        * html .goog-inline-block {
+            display: inline;
+        }
+        *:first-child + html .goog-inline-block {
+            display: inline;
+        }
+        .goog-custom-button {
+            margin: 2px;
+            border: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            color: #000;
+            background: #ddd url(//ssl.gstatic.com/editor/button-bg.png) repeat-x top left;
+            text-decoration: none;
+            list-style: none;
+            vertical-align: middle;
+            cursor: default;
+            outline: none;
+        }
+        .goog-custom-button-outer-box,
+        .goog-custom-button-inner-box {
+            border-style: solid;
+            border-color: #aaa;
+            vertical-align: top;
+        }
+        .goog-custom-button-outer-box {
+            margin: 0;
+            border-width: 1px 0;
+            padding: 0;
+        }
+        .goog-custom-button-inner-box {
+            -moz-box-orient: vertical;
+            margin: 0 -1px;
+            border-width: 0 1px;
+            padding: 3px 4px;
+            white-space: nowrap; /* Prevents buttons from line breaking on android. */
+        }
+        * html .goog-custom-button-inner-box {
+            left: -1px;
+        }
+        * html .goog-custom-button-rtl .goog-custom-button-outer-box {
+            /* @noflip */ left: -1px;
+        }
+        * html .goog-custom-button-rtl .goog-custom-button-inner-box {
+            /* @noflip */ right: auto;
+        }
+        *:first-child + html .goog-custom-button-inner-box {
+            left: -1px;
+        }
+        *:first-child + html .goog-custom-button-rtl .goog-custom-button-inner-box {
+            /* @noflip */ left: 1px;
+        }
+        ::root .goog-custom-button,
+        ::root .goog-custom-button-outer-box {
+            line-height: 0;
+        }
+        ::root .goog-custom-button-inner-box {
+            line-height: normal;
+        }
+        .goog-custom-button-disabled {
+            background-image: none !important;
+            opacity: 0.3;
+            -moz-opacity: 0.3;
+            filter: alpha(opacity=30);
+        }
+            .goog-custom-button-disabled .goog-custom-button-outer-box,
+            .goog-custom-button-disabled .goog-custom-button-inner-box {
+                color: #333 !important;
+                border-color: #999 !important;
+            }
+        * html .goog-custom-button-disabled {
+            margin: 2px 1px !important;
+            padding: 0 1px !important;
+        }
+        *:first-child + html .goog-custom-button-disabled {
+            margin: 2px 1px !important;
+            padding: 0 1px !important;
+        }
+        .goog-custom-button-hover .goog-custom-button-outer-box,
+        .goog-custom-button-hover .goog-custom-button-inner-box {
+            border-color: #9cf #69e #69e #7af !important; /* Hover border wins. */
+        }
+        .goog-custom-button-active,
+        .goog-custom-button-checked {
+            background-color: #bbb;
+            background-position: bottom left;
+        }
+        .goog-custom-button-focused .goog-custom-button-outer-box,
+        .goog-custom-button-focused .goog-custom-button-inner-box {
+            border-color: orange;
+        }
+        .goog-custom-button-collapse-right,
+        .goog-custom-button-collapse-right .goog-custom-button-outer-box,
+        .goog-custom-button-collapse-right .goog-custom-button-inner-box {
+            margin-right: 0;
+        }
+        .goog-custom-button-collapse-left,
+        .goog-custom-button-collapse-left .goog-custom-button-outer-box,
+        .goog-custom-button-collapse-left .goog-custom-button-inner-box {
+            margin-left: 0;
+        }
+            .goog-custom-button-collapse-left .goog-custom-button-inner-box {
+                border-left: 1px solid #fff;
+            }
+            .goog-custom-button-collapse-left.goog-custom-button-checked .goog-custom-button-inner-box {
+                border-left: 1px solid #ddd;
+            }
+            * html .goog-custom-button-collapse-left .goog-custom-button-inner-box {
+                left: 0;
+            }
+            *:first-child + html .goog-custom-button-collapse-left .goog-custom-button-inner-box {
+                left: 0;
+            }
+        .goog-menu-button {
+            background: #ddd url(//ssl.gstatic.com/editor/button-bg.png) repeat-x top left;
+            border: 0;
+            color: #000;
+            cursor: pointer;
+            list-style: none;
+            margin: 2px;
+            outline: none;
+            padding: 0;
+            text-decoration: none;
+            vertical-align: middle;
+        }
+        .goog-menu-button-outer-box,
+        .goog-menu-button-inner-box {
+            border-style: solid;
+            border-color: #aaa;
+            vertical-align: top;
+        }
+        .goog-menu-button-outer-box {
+            margin: 0;
+            border-width: 1px 0;
+            padding: 0;
+        }
+        .goog-menu-button-inner-box {
+            margin: 0 -1px;
+            border-width: 0 1px;
+            padding: 3px 4px;
+        }
+        * html .goog-menu-button-inner-box {
+            left: -1px;
+        }
+        * html .goog-menu-button-rtl .goog-menu-button-outer-box {
+            /* @noflip */ left: -1px;
+            /* @noflip */ right: auto;
+        }
+        * html .goog-menu-button-rtl .goog-menu-button-inner-box {
+            /* @noflip */ right: auto;
+        }
+        *:first-child + html .goog-menu-button-inner-box {
+            left: -1px;
+        }
+        /* IE7 BiDi fix. */
+        *:first-child + html .goog-menu-button-rtl .goog-menu-button-inner-box {
+            /* @noflip */ left: 1px;
+            /* @noflip */ right: auto;
+        }
+        ::root .goog-menu-button,
+        ::root .goog-menu-button-outer-box,
+        ::root .goog-menu-button-inner-box {
+            line-height: 0;
+        }
+        ::root .goog-menu-button-caption,
+        ::root .goog-menu-button-dropdown {
+            line-height: normal;
+        }
+        .goog-menu-button-disabled {
+            background-image: none !important;
+            opacity: 0.3;
+            -moz-opacity: 0.3;
+            filter: alpha(opacity=30);
+        }
+            .goog-menu-button-disabled .goog-menu-button-outer-box,
+            .goog-menu-button-disabled .goog-menu-button-inner-box,
+            .goog-menu-button-disabled .goog-menu-button-caption,
+            .goog-menu-button-disabled .goog-menu-button-dropdown {
+                color: #333 !important;
+                border-color: #999 !important;
+            }
+        * html .goog-menu-button-disabled {
+            margin: 2px 1px !important;
+            padding: 0 1px !important;
+        }
+        *:first-child + html .goog-menu-button-disabled {
+            margin: 2px 1px !important;
+            padding: 0 1px !important;
+        }
+        .goog-menu-button-hover .goog-menu-button-outer-box,
+        .goog-menu-button-hover .goog-menu-button-inner-box {
+            border-color: #9cf #69e #69e #7af !important; /* Hover border wins. */
+        }
+        .goog-menu-button-active,
+        .goog-menu-button-open {
+            background-color: #bbb;
+            background-position: bottom left;
+        }
+        .goog-menu-button-focused .goog-menu-button-outer-box,
+        .goog-menu-button-focused .goog-menu-button-inner-box {
+            border-color: orange;
+        }
+        .goog-menu-button-caption {
+            padding: 0 4px 0 0;
+            vertical-align: top;
+        }
+        .goog-menu-button-dropdown {
+            height: 15px;
+            width: 7px;
+            background: url(//ssl.gstatic.com/editor/editortoolbar.png) no-repeat -388px 0;
+            vertical-align: top;
+        }
+        .goog-menu-button-collapse-right,
+        .goog-menu-button-collapse-right .goog-menu-button-outer-box,
+        .goog-menu-button-collapse-right .goog-menu-button-inner-box {
+            margin-right: 0;
+        }
+        .goog-menu-button-collapse-left,
+        .goog-menu-button-collapse-left .goog-menu-button-outer-box,
+        .goog-menu-button-collapse-left .goog-menu-button-inner-box {
+            margin-left: 0;
+        }
+            .goog-menu-button-collapse-left .goog-menu-button-inner-box {
+                border-left: 1px solid #fff;
+            }
+            .goog-menu-button-collapse-left.goog-menu-button-checked .goog-menu-button-inner-box {
+                border-left: 1px solid #ddd;
+            }
+        .goog-menu {
+            background: #fff;
+            border-color: #ccc #666 #666 #ccc;
+            border-style: solid;
+            border-width: 1px;
+            cursor: default;
+            font: normal 13px Arial, sans-serif;
+            margin: 0;
+            outline: none;
+            padding: 4px 0;
+            position: absolute;
+            z-index: 20000; /* Arbitrary, but some apps depend on it... */
+        }
+        .goog-menuitem {
+            color: #000;
+            font: normal 13px Arial, sans-serif;
+            list-style: none;
+            margin: 0;
+            padding: 4px 7em 4px 28px;
+            white-space: nowrap;
+        }
+            .goog-menuitem.goog-menuitem-rtl {
+                padding-left: 7em;
+                padding-right: 28px;
+            }
+        .goog-menu-nocheckbox .goog-menuitem,
+        .goog-menu-noicon .goog-menuitem {
+            padding-left: 12px;
+        }
+        .goog-menu-noaccel .goog-menuitem {
+            padding-right: 20px;
+        }
+        .goog-menuitem-content {
+            color: #000;
+            font: normal 13px Arial, sans-serif;
+        }
+        .goog-menuitem-disabled .goog-menuitem-accel,
+        .goog-menuitem-disabled .goog-menuitem-content {
+            color: #ccc !important;
+        }
+        .goog-menuitem-disabled .goog-menuitem-icon {
+            opacity: 0.3;
+            -moz-opacity: 0.3;
+            filter: alpha(opacity=30);
+        }
+        .goog-menuitem-highlight,
+        .goog-menuitem-hover {
+            background-color: #d6e9f8;
+            border-color: #d6e9f8;
+            border-style: dotted;
+            border-width: 1px 0;
+            padding-bottom: 3px;
+            padding-top: 3px;
+        }
+        .goog-menuitem-checkbox,
+        .goog-menuitem-icon {
+            background-repeat: no-repeat;
+            height: 16px;
+            left: 6px;
+            position: absolute;
+            right: auto;
+            vertical-align: middle;
+            width: 16px;
+        }
+        .goog-menuitem-rtl .goog-menuitem-checkbox,
+        .goog-menuitem-rtl .goog-menuitem-icon {
+            left: auto;
+            right: 6px;
+        }
+        .goog-option-selected .goog-menuitem-checkbox,
+        .goog-option-selected .goog-menuitem-icon {
+            background: url(//ssl.gstatic.com/editor/editortoolbar.png) no-repeat -512px 0;
+        }
+        .goog-menuitem-accel {
+            color: #999;
+            /* @noflip */ direction: ltr;
+            left: auto;
+            padding: 0 6px;
+            position: absolute;
+            right: 0;
+            text-align: right;
+        }
+        .goog-menuitem-rtl .goog-menuitem-accel {
+            left: 0;
+            right: auto;
+            text-align: left;
+        }
+        .goog-menuitem-mnemonic-hint {
+            text-decoration: underline;
+        }
+        .goog-menuitem-mnemonic-separator {
+            color: #999;
+            font-size: 12px;
+            padding-left: 4px;
+        }
+
+        textarea {
+            width: 640px;
+            height: 100px;
+            padding: 2px;
+            overflow: auto;
+            font-family: monospace;
+            font-size: small;
+        }
+    </style>
+    <script src="../../lib/closure-library/closure/goog/base.js"></script>
+    <script src="functions.js"></script>
+    <script src="code.js"></script>
+</head>
+<body>
+    <fieldset>
+        <label id="selectEquations">&nbsp;&nbsp;Select a demo:&nbsp;&nbsp;</label>
+        <br />
+        <div id="container" style="overflow: hidden">
+            <div style="text-align: left;">
+                <canvas id="canvas" height="512" width="512"></canvas>
+            </div>
+        </div>
+        <div id="btnRun"></div>
+        <div style="overflow: hidden">
+            Red:<br />
+            <textarea id="textRed" wrap="off"></textarea>
+        </div>
+        <div style="overflow: hidden">
+            Green:<br />
+            <textarea id="textGreen" wrap="off"></textarea>
+        </div>
+        <div style="overflow: hidden">
+            Blue:<br />
+            <textarea id="textBlue" wrap="off"></textarea>
+        </div>
+    </fieldset>
+    <script>
+        DrawTweet.start();
+    </script>
+</body>
+</html>
