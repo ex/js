@@ -127,6 +127,7 @@ function rand( n ) {
 
 var nameFunctions = [
     'Gradient',
+    'Horizontals',
     'Table cloths',
     'Random painter',
     'Mandelbrot'
@@ -135,6 +136,12 @@ var redFunctions = [
     function ( i, j ) {
         var t = Math.cos( Math.atan2( j - 512, i - 512 ) / 2 );
         return t * t * 255;
+    },
+    function ( i, j ) {
+        if ( typeof window['staticKR'] === 'undefined' ) { window['staticKR'] = 0; }
+        window['staticKR'] += 2 * Math.random();
+        var l = Math.floor( window['staticKR'] ); l %= 512;
+        return l > 255 ? 511 - l : l;
     },
     function ( i, j ) {
         var s = 3 / ( j + 200 );
@@ -160,6 +167,12 @@ var greenFunctions = [
         return t * t * 255;
     },
     function ( i, j ) {
+        if ( typeof window['staticKG'] === 'undefined' ) { window['staticKG'] = 0; }
+        window['staticKG'] += 2 * Math.random();
+        var l = Math.floor( window['staticKG'] ); l %= 512;
+        return l > 255 ? 511 - l : l;
+    },
+    function ( i, j ) {
         var s = 3 / ( j + 200 );
         var y = ( j + Math.sin(( i * i + ( j - 700 ) * ( j - 700 ) * 5 ) / 100 / DIM ) * 35 ) * s;
         return ( Math.floor( 5 * ( ( i + DIM ) * s + y ) ) % 2 + Math.floor( 5 * ( ( DIM * 2 - i ) * s + y ) ) % 2 ) * 127;
@@ -181,6 +194,12 @@ var blueFunctions = [
     function ( i, j ) {
         var t = Math.cos( Math.atan2( j - 512, i - 512 ) / 2 + 2 * Math.acos( -1 ) / 3 );
         return t * t * 255;
+    },
+    function ( i, j ) {
+        if ( typeof window['staticKB'] === 'undefined' ) { window['staticKB'] = 0; }
+        window['staticKB'] += 2 * Math.random();
+        var l = Math.floor( window['staticKB'] ); l %= 512;
+        return l > 255 ? 511 - l : l;
     },
     function ( i, j ) {
         var s = 3 / ( j + 200 );
