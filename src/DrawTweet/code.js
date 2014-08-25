@@ -15,15 +15,6 @@ var textRed;
 var textGreen;
 var textBlue;
 
-function red( i, j ) {
-    return 255;
-}
-function green( i, j ) {
-    return 255;
-}
-function blue( i, j ) {
-    return 255;
-}
 function hexColor( c ) {
     return ( c > 16 ) ? c.toString( 16 ) : ( c > 0 ) ? '0' + c.toString( 16 ) : '00';
 }
@@ -36,9 +27,9 @@ function redraw() {
         for ( j = 0; j < canvasHeight; j++ ) {
             for ( i = 0; i < canvasWidth; i++ ) {
                 var index = ( i + j * canvasWidth ) * 4;
-                canvasData.data[index + 0] = red( 2 * i, 2 * j ) & 255;
-                canvasData.data[index + 1] = green( 2 * i, 2 * j ) & 255;
-                canvasData.data[index + 2] = blue( 2 * i, 2 * j ) & 255;
+                canvasData.data[index + 0] = window['red']( 2 * i, 2 * j ) & 255;
+                canvasData.data[index + 1] = window['green']( 2 * i, 2 * j ) & 255;
+                canvasData.data[index + 2] = window['blue']( 2 * i, 2 * j ) & 255;
                 canvasData.data[index + 3] = 255;
             }
         }
@@ -47,8 +38,8 @@ function redraw() {
     else {
         for ( j = 0; j < canvasHeight; j++ ) {
             for ( i = 0; i < canvasWidth; i++ ) {
-                ctx.fillStyle = '#' + hexColor( red( i, j ) ) + hexColor( green( i, j ) )
-                                    + hexColor( blue( i, j ) );
+                ctx.fillStyle = '#' + hexColor( window['red']( i, j ) ) + hexColor( window['green']( i, j ) )
+                                    + hexColor( window['blue']( i, j ) );
                 ctx.fillRect( i, j, 1, 1 );
             }
         }
@@ -56,32 +47,32 @@ function redraw() {
 }
 
 function onSelectEquation( index ) {
-    red = window['redFunctions'][index];
-    green = window['greenFunctions'][index];
-    blue = window['blueFunctions'][index];
-    textRed.setContent( red.toString() );
-    textGreen.setContent( green.toString() );
-    textBlue.setContent( blue.toString() );
+    window['red'] = window['redFunctions'][index];
+    window['green'] = window['greenFunctions'][index];
+    window['blue'] = window['blueFunctions'][index];
+    textRed.setContent( window['red'].toString() );
+    textGreen.setContent( window['green'].toString() );
+    textBlue.setContent( window['blue'].toString() );
     redraw();
 }
 
 function onCompileEquations() {
     try {
-        red = eval( "(" + textRed.getValue() + ")" );
+        window['red'] = eval( "(" + textRed.getValue() + ")" );
     }
     catch ( e ) {
         alert( "Error in Red function:\n" + e );
         return;
     };
     try {
-        green = eval( "(" + textGreen.getValue() + ")" );
+        window['green'] = eval( "(" + textGreen.getValue() + ")" );
     }
     catch ( e ) {
         alert( "Error in Green function:\n" + e );
         return;
     };
     try {
-        blue = eval( "(" + textBlue.getValue() + ")" );
+        window['blue'] = eval( "(" + textBlue.getValue() + ")" );
     }
     catch ( e ) {
         alert( "Error in Blue function:\n" + e );
@@ -140,7 +131,4 @@ DrawTweet.start = function () {
 }
 
 goog.exportSymbol( 'DrawTweet.start', DrawTweet.start );
-goog.exportSymbol( 'red', red );
-goog.exportSymbol( 'green', green );
-goog.exportSymbol( 'blue', blue );
 

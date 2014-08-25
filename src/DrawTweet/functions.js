@@ -1,8 +1,15 @@
 
+var seed = 1;
+function generate() {
+    return seed = ( seed * 16807 ) % 2147483647;
+}
+function random() {
+    return generate() / 2147483647;
+}
 function Array2D( x, y ) {
-    var array2D = new Array( x );
-    for ( var i = 0; i < array2D.length; i++ ) {
-        array2D[i] = new Array(y);
+    var array2D = [];
+    for ( var i = 0; i < x; i++ ) {
+        array2D[i] = [];
     }
     return array2D;
 }
