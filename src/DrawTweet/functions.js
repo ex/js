@@ -41,9 +41,9 @@ var redFunctions = [
         return ( Math.floor(( i + 1024 ) * s + y ) % 2 + Math.floor(( 1024 * 2 - i ) * s + y ) % 2 ) * 127;
     },
     function ( i, j ) {
-        if ( !window['staticRed'] ) { window['staticRed'] = new Array2D( 1024, 1024 ); }
-        var c = window['staticRed'];
-        return !c[i][j] ? c[i][j] = !rand( 999 ) ? rand( 256 ) : red(( i + rand( 2 ) ) % 1024, ( j + rand( 2 ) ) % 1024 ) : c[i][j];
+        if ( ( i == 0 ) && ( j == 0 ) ) { window['staticRed'] = new Array2D( 512, 512 ); }
+        var c = window['staticRed'], ih = Math.floor( i / 2 ), jh = Math.floor( j / 2 );
+        return !c[ih][jh] ? c[ih][jh] = !rand( 999 ) ? rand( 256 ) : red(( i + rand( 2 ) ) % 1024, ( j + rand( 2 ) ) % 1024 ) : c[ih][jh];
     },
     function ( i, j ) {
         var a = 0, b = 0, c, d, n = 0;
@@ -70,9 +70,9 @@ var greenFunctions = [
         return ( Math.floor( 5 * ( ( i + 1024 ) * s + y ) ) % 2 + Math.floor( 5 * ( ( 1024 * 2 - i ) * s + y ) ) % 2 ) * 127;
     },
     function ( i, j ) {
-        if ( !window['staticGreen'] ) { window['staticGreen'] = new Array2D( 1024, 1024 ); }
-        var c = window['staticGreen'];
-        return !c[i][j] ? c[i][j] = !rand( 999 ) ? rand( 256 ) : green(( i + rand( 2 ) ) % 1024, ( j + rand( 2 ) ) % 1024 ) : c[i][j];
+        if ( ( i == 0 ) && ( j == 0 ) ) { window['staticGreen'] = new Array2D( 512, 512 ); }
+        var c = window['staticGreen'], ih = Math.floor( i / 2 ), jh = Math.floor( j / 2 );
+        return !c[ih][jh] ? c[ih][jh] = !rand( 999 ) ? rand( 256 ) : green(( i + rand( 2 ) ) % 1024, ( j + rand( 2 ) ) % 1024 ) : c[ih][jh];
     },
     function ( i, j ) {
         var a = 0, b = 0, c, d, n = 0;
@@ -99,9 +99,9 @@ var blueFunctions = [
         return ( Math.floor( 29 * ( ( i + 1024 ) * s + y ) ) % 2 + Math.floor( 29 * ( ( 1024 * 2 - i ) * s + y ) ) % 2 ) * 127;
     },
     function ( i, j ) {
-        if ( !window['staticBlue'] ) { window['staticBlue'] = new Array2D( 1024, 1024 ); }
-        var c = window['staticBlue'];
-        return !c[i][j] ? c[i][j] = !rand( 999 ) ? rand( 256 ) : blue(( i + rand( 2 ) ) % 1024, ( j + rand( 2 ) ) % 1024 ) : c[i][j];
+        if ( ( i == 0 ) && ( j == 0 ) ) { window['staticBlue'] = new Array2D( 512, 512 ); }
+        var c = window['staticBlue'], ih = Math.floor( i / 2 ), jh = Math.floor( j / 2 );
+        return !c[ih][jh] ? c[ih][jh] = !rand( 999 ) ? rand( 256 ) : blue(( i + rand( 2 ) ) % 1024, ( j + rand( 2 ) ) % 1024 ) : c[ih][jh];
     },
     function ( i, j ) {
         var a = 0, b = 0, c, d, n = 0;
