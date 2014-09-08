@@ -73,8 +73,8 @@ def _GetJsCompilerArgs(compiler_jar_path, java_version, source_paths,
                        jvm_flags, compiler_flags):
   """Assembles arguments for call to JsCompiler."""
 
-  if java_version < (1, 6):
-    raise JsCompilerError('Closure Compiler requires Java 1.6 or higher. '
+  if java_version < (1, 7):
+    raise JsCompilerError('Closure Compiler requires Java 1.7 or higher. '
                           'Please visit http://www.java.com/getjava')
 
   args = ['java']
@@ -122,7 +122,7 @@ def Compile(compiler_jar_path, source_paths,
     The compiled source, as a string, or None if compilation failed.
   """
 
-  java_version = (1, 6) ##_ParseJavaVersion(_GetJavaVersionString())
+  java_version = (1, 7) ##_ParseJavaVersion(_GetJavaVersionString())
 
   args = _GetJsCompilerArgs(
       compiler_jar_path, java_version, source_paths, jvm_flags, compiler_flags)
