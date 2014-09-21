@@ -42,8 +42,8 @@ var redFunctions = [
     },
     function ( i, j ) {
         if ( ( i == 0 ) && ( j == 0 ) ) { window['staticRed'] = new Array2D( 512, 512 ); }
-        var c = window['staticRed'], ih = Math.floor( i / 2 ), jh = Math.floor( j / 2 );
-        return !c[ih][jh] ? c[ih][jh] = !rand( 999 ) ? rand( 256 ) : red(( i + rand( 2 ) ) % 1024, ( j + rand( 2 ) ) % 1024 ) : c[ih][jh];
+        var c = window['staticRed'], x = Math.floor( i / 2 ), y = Math.floor( j / 2 );
+        return !c[x][y] ? c[x][y] = !rand( 999 ) ? rand( 256 ) : red(( i + rand( 2 ) ) % 1024, ( j + rand( 2 ) ) % 1024 ) : c[x][y];
     },
     function ( i, j ) {
         var a = 0, b = 0, c, d, n = 0;
@@ -71,8 +71,8 @@ var greenFunctions = [
     },
     function ( i, j ) {
         if ( ( i == 0 ) && ( j == 0 ) ) { window['staticGreen'] = new Array2D( 512, 512 ); }
-        var c = window['staticGreen'], ih = Math.floor( i / 2 ), jh = Math.floor( j / 2 );
-        return !c[ih][jh] ? c[ih][jh] = !rand( 999 ) ? rand( 256 ) : green(( i + rand( 2 ) ) % 1024, ( j + rand( 2 ) ) % 1024 ) : c[ih][jh];
+        var c = window['staticGreen'], x = Math.floor( i / 2 ), y = Math.floor( j / 2 );
+        return !c[x][y] ? c[x][y] = !rand( 999 ) ? rand( 256 ) : green(( i + rand( 2 ) ) % 1024, ( j + rand( 2 ) ) % 1024 ) : c[x][y];
     },
     function ( i, j ) {
         var a = 0, b = 0, c, d, n = 0;
@@ -100,8 +100,8 @@ var blueFunctions = [
     },
     function ( i, j ) {
         if ( ( i == 0 ) && ( j == 0 ) ) { window['staticBlue'] = new Array2D( 512, 512 ); }
-        var c = window['staticBlue'], ih = Math.floor( i / 2 ), jh = Math.floor( j / 2 );
-        return !c[ih][jh] ? c[ih][jh] = !rand( 999 ) ? rand( 256 ) : blue(( i + rand( 2 ) ) % 1024, ( j + rand( 2 ) ) % 1024 ) : c[ih][jh];
+        var c = window['staticBlue'], x = Math.floor( i / 2 ), y = Math.floor( j / 2 );
+        return !c[x][y] ? c[x][y] = !rand( 999 ) ? rand( 256 ) : blue(( i + rand( 2 ) ) % 1024, ( j + rand( 2 ) ) % 1024 ) : c[x][y];
     },
     function ( i, j ) {
         var a = 0, b = 0, c, d, n = 0;
