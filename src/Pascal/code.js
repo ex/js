@@ -34,6 +34,8 @@ Pascal = function ( canvasName, colors, lineColor, borderColor, backColor, textC
     this.m_nextOrder = 0;
     this.m_cells = 0;
     this.m_array = null;
+    this.m_started = false;
+    this.m_active = false;
 
     this.m_row = 0;	// File to draw
     this.m_color = 0;	// Random index color
@@ -71,9 +73,14 @@ Pascal.prototype.setReady = function setReady() {
 };
 
 Pascal.prototype.start = function start() {
-    this.m_nextOrder = this.getNextOrder();
-    this.makeTriangle();
-    setInterval( this.update.bind( this ), 1000 / 35 );
+    if ( !this.m_started ) {
+        this.m_nextOrder = this.getNextOrder();
+        this.makeTriangle();
+        setInterval( this.update.bind( this ), 1000 / 35 );
+        this.m_started = true;
+    }
+    this.m_active = !this.m_active;
+    return this.m_active;
 };
 
 Pascal.prototype.getNextOrder = function getNextOrder() {
@@ -133,6 +140,9 @@ Pascal.prototype.onRedraw = function onRedraw() {
 };
 
 Pascal.prototype.update = function update() {
+    if ( !this.m_active ) {
+        return;
+    }
     switch ( this.m_state ) {
         case this.ST_DRAW:
             if ( this.m_row >= this.m_array.length ) {

@@ -14,9 +14,9 @@
         }
     </style>
 </head>
-<body onload="init()" style="background-color:#582d0c">
+<body onload="init()" style="background-color:#391104">
     <br />
-    <div align='center'>
+    <div align='center' class="container">
         <canvas id="canvas" width="501" height="501" > </canvas>
     </div>
     <script>
@@ -28,6 +28,7 @@
         ];
         var pascal = new Pascal( 'canvas', COLORS, '#FFFFFF', 'rgba(255,255,0,0.35)', '#EB3905', '#FFFF00' );
         var canvas = document.getElementById( "canvas" );
+        var sound = null;
 
         function init() {
 
@@ -39,9 +40,9 @@
             var manifest = [
                 { id: 'Music', src: 'music.ogg' },
             ];
-            //var queue = new createjs.LoadQueue( true, 'http://sites.google.com/site/exeqtor/' );
-            var queue = new createjs.LoadQueue( true, '' );
-            createjs.Sound.alternateExtensions = ["mp3"];
+            var queue = new createjs.LoadQueue();
+            createjs.LoadQueue.loadTimeout = 12000;
+            createjs.Sound.alternateExtensions = ['mp3'];
             queue.installPlugin( createjs.Sound );
             queue.addEventListener( 'fileload', onSoundLoaded );
             queue.addEventListener( 'error', onErrorLoading );
@@ -59,9 +60,16 @@
         }
 
         function onClick( event ) {
-            pascal.start();
-            createjs.Sound.play( 'Music', { loop: -1, volume: 0.75 } );
-            canvas.removeEventListener( 'click', onClick, false );
+            var running = pascal.start();
+            if ( !sound ) {
+                sound = createjs.Sound.play( 'Music', { loop: -1, volume: 0.75 } );
+            }
+            else if ( running ) {
+                sound.resume();
+            }
+            else {
+                sound.pause();
+            }
         }
     </script>
 </body>
