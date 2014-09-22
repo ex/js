@@ -5,6 +5,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
     <title>Pascal triangle animation</title>
+    <script src="../../lib/soundjs/preloadjs-0.4.1.min.js"></script>
+    <script src="../../lib/soundjs/soundjs-0.5.2.min.js"></script>
     <script src="code.js"></script>
     <style>
         canvas {
@@ -12,27 +14,55 @@
         }
     </style>
 </head>
-<body>
-    <div>
-        <canvas id="canvas1" width="501" height="501" > </canvas>
-        <br />
-        <canvas id="canvas2" width="501" height="501" > </canvas>
+<body onload="init()" style="background-color:#582d0c">
+    <br />
+    <div align='center'>
+        <canvas id="canvas" width="501" height="501" > </canvas>
     </div>
     <script>
-        var COLORS_1 = [
-            '0054CE', '0054CE', '0074F2', '007FF2', '00416B',
-            '005D83', '006698', '0080B1', '0087CD', '00A9D5',
-            '00B2FC', '00ECFF', '00BFF2', '00A2FF', '00A2E7',
-            '00A2C4', '00A2A4'
-        ];
-        new Pascal( 'canvas1', COLORS_1, '#FF9AC5', '#6999FF', '#FFFFFF' );
-        var COLORS_2 = [
+        var COLORS = [
             'FF00FF', 'FF54CE', 'F574F2', 'CF7FF2', 'FA416B',
             'FF5D83', 'F36698', 'D780B1', 'B987CD', 'A8A9D5',
             '98B2FC', '00ECFF', 'FFBFF2', 'F4A2FF', 'FFA2E7',
             'FFA2C4', 'FFA2A4'
         ];
-        new Pascal( 'canvas2', COLORS_2, '#FFFFFF', 'rgba(255,255,0,0.3)', '#EB3905' );
+        var pascal = new Pascal( 'canvas', COLORS, '#FFFFFF', 'rgba(255,255,0,0.35)', '#EB3905', '#FFFF00' );
+        var canvas = document.getElementById( "canvas" );
+
+        function init() {
+
+            // Check that we can play audio
+            if ( !createjs.Sound.initializeDefaultPlugins() ) {
+                return;
+            }
+            var audioPath = '';
+            var manifest = [
+                { id: 'Music', src: 'music.ogg' },
+            ];
+            //var queue = new createjs.LoadQueue( true, 'http://sites.google.com/site/exeqtor/' );
+            var queue = new createjs.LoadQueue( true, '' );
+            createjs.Sound.alternateExtensions = ["mp3"];
+            queue.installPlugin( createjs.Sound );
+            queue.addEventListener( 'fileload', onSoundLoaded );
+            queue.addEventListener( 'error', onErrorLoading );
+            queue.loadManifest( manifest );
+        }
+
+        function onErrorLoading( event ) {
+            pascal.start();
+            canvas.removeEventListener( 'click', onClick, false );
+        }
+
+        function onSoundLoaded( event ) {
+            pascal.setReady();
+            canvas.addEventListener( 'click', onClick, false );
+        }
+
+        function onClick( event ) {
+            pascal.start();
+            createjs.Sound.play( 'Music', { loop: -1, volume: 0.75 } );
+            canvas.removeEventListener( 'click', onClick, false );
+        }
     </script>
 </body>
 </html>

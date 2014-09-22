@@ -1,7 +1,7 @@
 
-Pascal = function ( canvasName, colors, lineColor, borderColor, backColor ) {
+Pascal = function ( canvasName, colors, lineColor, borderColor, backColor, textColor ) {
 
-    this.TIME_SHOW = 1500;
+    this.TIME_SHOW = 1000;
     this.TIME_FADE = 100;
     this.ALPHA_DECREASE = 0.011;
 
@@ -26,6 +26,7 @@ Pascal = function ( canvasName, colors, lineColor, borderColor, backColor ) {
     this.m_lineColor = lineColor;
     this.m_borderColor = borderColor;
     this.m_backColor = backColor;
+    this.m_textColor = textColor;
 
     this.m_halfWidth = 0;
     this.m_halfHeight = 0;
@@ -52,12 +53,28 @@ Pascal = function ( canvasName, colors, lineColor, borderColor, backColor ) {
     this.m_boderContext = this.m_borderCanvas.getContext( '2d' );
     this.m_backContext = this.m_backCanvas.getContext( '2d' );
 
-    // Calculate next
+    this.m_context.fillStyle = this.m_backColor;
+    this.m_context.fillRect( 0, 0, 2 * this.m_halfWidth, 2 * this.m_halfHeight );
+    this.m_context.fillStyle = textColor;
+    this.m_context.font = '12px Verdana';
+    this.m_context.fillText( 'Loading...', this.m_halfWidth - 30, this.m_halfHeight - 5 );
+}
+
+Pascal.prototype.setReady = function setReady() {
+    this.m_context.fillStyle = this.m_backColor;
+    this.m_context.fillRect( 0, 0, 2 * this.m_halfWidth, 2 * this.m_halfHeight );
+    this.m_context.fillStyle = this.m_textColor;
+    this.m_context.font = '12px Verdana';
+    this.m_context.fillText( 'Code: Laurens Rodriguez', this.m_halfWidth - 80, this.m_halfHeight - 20 );
+    this.m_context.fillText( 'Music: Micky Gonzalez', this.m_halfWidth - 80, this.m_halfHeight - 5 );
+    this.m_context.fillText( "Click to play", this.m_halfWidth - 80, this.m_halfHeight + 10 );
+};
+
+Pascal.prototype.start = function start() {
     this.m_nextOrder = this.getNextOrder();
     this.makeTriangle();
-
-    setInterval( this.update.bind( this ), 1000 / 30 );
-}
+    setInterval( this.update.bind( this ), 1000 / 35 );
+};
 
 Pascal.prototype.getNextOrder = function getNextOrder() {
     var num = 2 + Math.floor( Math.random() * this.m_cells );
