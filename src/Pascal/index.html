@@ -7,6 +7,7 @@
     <title>Pascal triangle animation</title>
     <script src="../../lib/soundjs/preloadjs-0.4.1.min.js"></script>
     <script src="../../lib/soundjs/soundjs-0.5.2.min.js"></script>
+    <script src="../../lib/soundjs/flashplugin-0.5.2.min.js"></script>
     <script src="code.js"></script>
     <style>
         canvas {
@@ -32,10 +33,13 @@
 
         function init() {
 
-            // Check that we can play audio
-            if ( !createjs.Sound.initializeDefaultPlugins() ) {
-                return;
-            }
+            //// Check that we can play audio
+            //if ( !createjs.Sound.initializeDefaultPlugins() ) {
+            //    return;
+            //}
+            createjs.FlashPlugin.swfPath = "../../lib/soundjs/"
+            createjs.Sound.registerPlugins( [createjs.FlashPlugin] );
+
             var audioPath = '';
             var manifest = [
                 { id: 'Music', src: 'music.ogg' },
