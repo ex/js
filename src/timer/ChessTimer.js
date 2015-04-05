@@ -29,8 +29,6 @@ ApplicationMain.create = function() {
 	types.push("FONT");
 	urls.push("assets/images/back.png");
 	types.push("IMAGE");
-	urls.push("assets/images/top.pdn");
-	types.push("TEXT");
 	urls.push("assets/images/top.png");
 	types.push("IMAGE");
 	urls.push("assets/sounds/fx_line.ogg");
@@ -1209,9 +1207,6 @@ var DefaultAssetLibrary = function() {
 	id = "assets/images/back.png";
 	this.path.set(id,id);
 	this.type.set(id,"IMAGE");
-	id = "assets/images/top.pdn";
-	this.path.set(id,id);
-	this.type.set(id,"TEXT");
 	id = "assets/images/top.png";
 	this.path.set(id,id);
 	this.type.set(id,"IMAGE");
