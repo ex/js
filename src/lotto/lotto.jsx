@@ -84,7 +84,7 @@ var LottoRandom = React.createClass({
     calculate: function() {
         var play = [];
         for ( var k = 0; k < 6; k++ ) {
-            play.push( 1 + Math.floor( this.props.max * Math.random() ) );
+            play.push( 1 + Math.floor( this.props.max  * Math.random() ) );
         }
         return play;
     },
@@ -92,12 +92,26 @@ var LottoRandom = React.createClass({
         e.preventDefault();
         this.setState({play: this.calculate()});
     },
+    onMaxChange: function( e ) {
+        e.preventDefault();
+        this.props.max = e.target.value;
+    },
     render: function() {
+        var optionStyle = {
+            width: '100px'
+        };
         return (
             <div>
                 <h4>Random Lotto</h4>
                 <form onSubmit={this.handleSubmit}>
                     <table>
+                        <tr>
+                            <select name="optMaxLotto" size="1" style={optionStyle} onChange={this.onMaxChange}>
+                                <option value="40">40</option>
+                                <option value="45">45</option>
+                                <option value="50">50</option>
+                            </select>
+                        </tr>
                         <tr>
                             <td><LottoEntry lotto={this.state.play}/></td>
                             <td width={10}/>
