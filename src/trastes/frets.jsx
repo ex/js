@@ -9,7 +9,16 @@ var Frets = React.createClass({
         };
     },
     calculate: function() {
-        ////
+        var R = Math.pow( 0.5, 1.0 / this.state.edo );
+        var T = this.state.frets + " TRASTES DEL SISTEMA " + this.state.edo + " EDO CON " + this.state.scale + " DE ESCALA\n\n";
+        T += "traste 00 = 00.000000000000000\n";
+        var L = this.state.scale;
+        for ( var i = 1; i <= this.state.frets; i++ ) {
+            L = L * R;
+            var x = this.state.scale - L;
+            T += ( ( i < 10 ) ? "traste 0" : "traste " ) + i + " = " + x + "\n";
+        }
+        this.setState( { result: T } );
     },
     handleSubmit: function( e ) {
         e.preventDefault();
