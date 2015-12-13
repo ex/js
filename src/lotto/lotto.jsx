@@ -74,27 +74,29 @@ var LottoPlayer = React.createClass( {
     }
 } );
 
-var LottoRandom = React.createClass({
-    getDefaultProps: function() {
-        return { max: 40 };
-    },
+var LottoRandom = React.createClass( {
     getInitialState: function() {
-        return { play: this.calculate() };
+        return {
+            max: 40,
+            play: this.calculate( 40 )
+        };
     },
-    calculate: function() {
+    calculate: function( init ) {
+        var max = init ? init : this.state.max;
         var play = [];
         for ( var k = 0; k < 6; k++ ) {
-            play.push( 1 + Math.floor( this.props.max  * Math.random() ) );
+            play.push( 1 + Math.floor( max * Math.random() ) );
         }
         return play;
     },
     handleSubmit: function( e ) {
         e.preventDefault();
-        this.setState({play: this.calculate()});
+        this.setState( { play: this.calculate() } );
     },
     onMaxChange: function( e ) {
         e.preventDefault();
-        this.props.max = e.target.value;
+        this.setState( { max: e.target.value } );
+        this.setState( { play: this.calculate() } );
     },
     render: function() {
         var optionStyle = {
@@ -105,18 +107,22 @@ var LottoRandom = React.createClass({
                 <h4>Random Lotto</h4>
                 <form onSubmit={this.handleSubmit}>
                     <table>
-                        <tr>
-                            <select name="optMaxLotto" size="1" style={optionStyle} onChange={this.onMaxChange}>
-                                <option value="40">40</option>
-                                <option value="45">45</option>
-                                <option value="50">50</option>
-                            </select>
-                        </tr>
-                        <tr>
-                            <td><LottoEntry lotto={this.state.play}/></td>
-                            <td width={10}/>
-                            <td><button>Calculate</button></td>
-                        </tr>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select name="optMaxLotto" size="1" style={optionStyle} onChange={this.onMaxChange}>
+                                        <option value="40">40</option>
+                                        <option value="45">45</option>
+                                        <option value="50">50</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><LottoEntry lotto={this.state.play} /></td>
+                                <td width={10} />
+                                <td><button>Calculate</button></td>
+                            </tr>
+                        </tbody>
                     </table>
                 </form>
             </div>
@@ -124,7 +130,7 @@ var LottoRandom = React.createClass({
     }
 });
 
-React.render(
+ReactDOM.render(
     <div>
         <LottoRandom/><br/>
         <LottoPlayer/><br/>
