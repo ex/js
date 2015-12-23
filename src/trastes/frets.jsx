@@ -5,7 +5,7 @@ var Frets = React.createClass({
             frets: 18,
             scale: 100,
             edo: 12,
-            result: "18 TRASTES DEL SISTEMA 12 EDO CON 100.00 DE ESCALA\n\ntraste 00 = 00.000000000000000\ntraste 01 = 05.612568731830649\ntraste 02 = 10.910128185966059\ntraste 03 = 15.910358474628538\ntraste 04 = 20.629947401590016\ntraste 05 = 25.084646156165917\ntraste 06 = 29.289321881345231\ntraste 07 = 33.258007291498259\ntraste 08 = 37.003947505256320\ntraste 09 = 40.539644249863926\ntraste 10 = 43.876897584531328\ntraste 11 = 47.026845282035211\ntraste 12 = 49.999999999999972\ntraste 13 = 52.806284365915296\ntraste 14 = 55.455064092983008\ntraste 15 = 57.955179237314248\ntraste 16 = 60.314973700794987\ntraste 17 = 62.542323078082937\ntraste 18 = 64.644660940672594"
+            result: "Press calcualte"
         };
     },
     calculate: function() {
@@ -33,13 +33,10 @@ var Frets = React.createClass({
         this.setState( { edo: isNaN( val ) ? 0 : val } );
     },
     changeScale: function( e ) {
-        var val = e.target.value;
+        var val = Number( e.target.value );
         this.setState( { scale: isNaN( val ) ? 0 : val } );
     },
     render: function() {
-        var optionStyle = {
-            width: '100px'
-        };
         return (
             <div>
                 <h4>Frets Calculator</h4>
