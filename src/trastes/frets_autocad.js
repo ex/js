@@ -18,8 +18,8 @@ var Frets = React.createClass({
         };
     },
     calculate: function() {
-        var A = this.state.width1;
-        var B = this.state.width2;
+        var A = Number( this.state.width1 );
+        var B = Number( this.state.width2 );
         var x = this.state.x;
         var y = this.state.y;
 
@@ -27,8 +27,8 @@ var Frets = React.createClass({
         if ( A < B ) {
             var t = A; A = B; B = t;
         }
-        var L = this.state.length;
-        var D = this.state.length;
+        var L = Number( this.state.length );
+        var D = L;
         var R = Math.pow( 0.5, 1.0 / this.state.edo );
 
         var T = "COLOR\nGROSORLIN\nZ\n" +  pf( x - 5 ) + "," + pf( y ) + "\n" + pf( x + D + 5 ) + "," + pf( y ) + "\n_line\n" + pf( x )
@@ -65,23 +65,23 @@ var Frets = React.createClass({
         this.setState( { edo: isNaN( val ) ? 0 : val } );
     },
     changeLength: function( e ) {
-        var val = Number( e.target.value );
+        var val = e.target.value;
         this.setState( { length: isNaN( val ) ? 0 : val } );
     },
     changeX: function( e ) {
-    	var val = Number( e.target.value );
+        var val = Math.floor( e.target.value );
         this.setState( { x: isNaN( val ) ? 0 : val } );
     },
     changeY: function( e ) {
-    	var val = Number( e.target.value );
+        var val = Math.floor( e.target.value );
         this.setState( { y: isNaN( val ) ? 0 : val } );
     },
     changeWidth1: function( e ) {
-    	var val = Number( e.target.value );
+    	var val = e.target.value;
         this.setState( { width1: isNaN( val ) ? 0 : val } );
     },
     changeWidth2: function( e ) {
-    	var val = Number( e.target.value );
+    	var val = e.target.value;
         this.setState( { width2: isNaN( val ) ? 0 : val } );
     },
     render: function() {
