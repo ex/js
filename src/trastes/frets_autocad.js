@@ -1,18 +1,23 @@
 ﻿
 var numberFormat = new Intl.NumberFormat( 'en-IN', { minimumFractionDigits: 5 } )
+
 function pf( v ) {
     return numberFormat.format( v );
+};
+
+function validate( v, old ) {
+    return ( ( v === '-' ) || !isNaN( v ) ) ? v : old;
 };
 
 var Frets = React.createClass({
     getInitialState: function() {
         return {
-            x: 0.0,
-            y: 0.0,
-            length: 0.0,
-            width1: 0.0,
-            width2: 0.0,
-            frets: 0.0,
+            x: 0,
+            y: 0,
+            length: 0,
+            width1: 0,
+            width2: 0,
+            frets: 20,
             edo: 12,
             result: "Press Calculate"
         };
@@ -20,8 +25,8 @@ var Frets = React.createClass({
     calculate: function() {
         var A = Number( this.state.width1 );
         var B = Number( this.state.width2 );
-        var x = this.state.x;
-        var y = this.state.y;
+        var x = Number( this.state.x );
+        var y = Number( this.state.y );
 
         y -= ( A - B ) / 2.0;
         if ( A < B ) {
@@ -58,31 +63,31 @@ var Frets = React.createClass({
     },
     changeFrets: function( e ) {
         var val = Math.floor( e.target.value );
-        this.setState( { frets: isNaN( val ) ? 0 : val } );
+        this.setState( { frets: isNaN( val ) ? this.state.frets : val } );
     },
     changeEdo : function( e ) {
         var val = Math.floor( e.target.value );
-        this.setState( { edo: isNaN( val ) ? 0 : val } );
+        this.setState( { edo: isNaN( val ) ? this.state.edo : val } );
     },
     changeLength: function( e ) {
         var val = e.target.value;
-        this.setState( { length: isNaN( val ) ? 0 : val } );
+        this.setState( { length: validate( val, this.state.length ) } );
     },
     changeX: function( e ) {
-        var val = Math.floor( e.target.value );
-        this.setState( { x: isNaN( val ) ? 0 : val } );
+        var val = e.target.value;
+        this.setState( { x: validate( val, this.state.x ) } );
     },
     changeY: function( e ) {
-        var val = Math.floor( e.target.value );
-        this.setState( { y: isNaN( val ) ? 0 : val } );
+        var val = e.target.value;
+        this.setState( { y: validate( val, this.state.y ) } );
     },
     changeWidth1: function( e ) {
     	var val = e.target.value;
-        this.setState( { width1: isNaN( val ) ? 0 : val } );
+    	this.setState( { width1: validate( val, this.state.width1 ) } );
     },
     changeWidth2: function( e ) {
     	var val = e.target.value;
-        this.setState( { width2: isNaN( val ) ? 0 : val } );
+    	this.setState( { width2: validate( val, this.state.width2 ) } );
     },
     render: function() {
         return (
