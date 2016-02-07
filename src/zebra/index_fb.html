@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <title>Zebra</title>
+    <script src="zebra.js"></script>
+    <style>
+        canvas {
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+        }
+		.center-div {
+			color: #666666;
+			font: normal 12px Verdana, sans-serif;
+			margin: 0 auto;
+		    width: 180px;
+		    height: 25px;
+		}
+    </style>
+</head>
+<body onload="init()" style="background-color:#FFFFFF">
+    <div class="center-div" id="fb-welcome">&nbsp;</div>
+    <script>
+        window.fbAsyncInit = function () {
+            FB.init( {
+                appId: '563220080523458',
+                xfbml: true,
+                version: 'v2.5'
+            } );
+
+            function onLogin( response ) {
+                if ( response.status == 'connected' ) {
+                    FB.api( '/me?fields=first_name', function ( data ) {
+                        var welcomeBlock = document.getElementById( 'fb-welcome' );
+                        welcomeBlock.innerHTML = 'Hey <b>' + data.first_name + '</b>! Solve this :D';
+                    } );
+                }
+            }
+
+            FB.getLoginStatus( function ( response ) {
+                // Check login status on load, and if the user is
+                // already logged in, go directly to the welcome message.
+                if ( response.status == 'connected' ) {
+                    onLogin( response );
+                } else {
+                    // Otherwise, show Login dialog first.
+                    FB.login( function ( response ) {
+                        onLogin( response );
+                    }, { scope: 'user_friends, email' } );
+                }
+            } );
+        };
+
+        ( function ( d, s, id ) {
+            var js, fjs = d.getElementsByTagName( s )[0];
+            if ( d.getElementById( id ) ) { return; }
+            js = d.createElement( s ); js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore( js, fjs );
+        }( document, 'script', 'facebook-jssdk' ) );
+    </script>
+    <div align='center'>
+        <canvas id="canvas"></canvas>
+        <!--<img id="zebra_sprites" src="http://sites.google.com/site/exeqtor/zebra_sprites.png" width="0" height="0"/>-->
+        <img id="zebra_sprites" src="images/zebra_sprites.png" width="0" height="0"/>
+    </div>
+    <script>
+        function init() {
+            var canvas = document.getElementById( "canvas" );
+            var puzzle = new ZebraPuzzle( canvas );
+        }
+    </script>
+</body>
+</html>

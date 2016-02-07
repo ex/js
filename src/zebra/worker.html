@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <title>Zebra Brute Force</title>
+    <style>
+		.div-progress {
+			color: #6666FF;
+			font: normal 11px Verdana, sans-serif;
+			margin: 0 auto;
+		}
+		.div-eta {
+			color: #FF6666;
+			font: normal 11px Verdana, sans-serif;
+			margin: 0 auto;
+		}
+		.div-results {
+			color: #444444;
+			font: normal 11px Verdana, sans-serif;
+			margin: 0 auto;
+		}
+    </style>
+</head>
+<body>
+    <div id="labelProgress" class="div-progress">Progress</div><br />
+    <div id="labelETA" class="div-eta">ETA</div><br />
+    <div id="labelResults" class="div-results">Solutions</div>
+    <script>
+        if ( typeof Worker !== 'undefined' ) {
+
+            var divResults = document.getElementById( 'labelResults' );
+
+            var worker = new Worker( 'worker.js' );
+
+            worker.onmessage = function ( event ) {
+                if ( event.data.solution ) {
+                    var node = document.createElement( "div" );
+                    node.innerHTML = event.data.solution;
+                    divResults.appendChild( node );
+                }
+                else {
+                    document.getElementById( 'labelProgress' ).innerHTML = 'Progress: ' + event.data.progress;
+                    document.getElementById( 'labelETA' ).innerHTML = 'ETA: ' + event.data.eta;
+                }
+            };
+        }
+    </script>
+</body>
+</html>

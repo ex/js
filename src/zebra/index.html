@@ -12,17 +12,18 @@
         }
     </style>
 </head>
-<body onload="init()" style="background-color:#000000">
-    <br />
-    <div align='center' class="container">
+<body style="background-color:#000000">
+    <div align='center'>
         <canvas id="canvas"></canvas>
-        <!--<img id="zebra_sprites" src="http://sites.google.com/site/exeqtor/zebra_sprites.png" width="0" height="0"/>-->
-        <img id="zebra_sprites" src="images/zebra_sprites.png" width="0" height="0"/>
+        <!--<img id="zebra_sprites" src="http://sites.google.com/site/exeqtor/zebra_sprites.png" width="0" height="0" onload="onImageLoad()"/>-->
+        <img id="zebra_sprites" src="images/zebra_sprites.png" width="0" height="0" onload="onImageLoad()"/>
     </div>
     <script>
-        function init() {
-            var canvas = document.getElementById( "canvas" );
-            var puzzle = new ZebraPuzzle( canvas );
+        var canvas = document.getElementById( "canvas" );
+        var puzzle = new ZebraPuzzle( canvas );
+
+        function onImageLoad() {
+            puzzle.onLoaded();
         }
     </script>
 </body>

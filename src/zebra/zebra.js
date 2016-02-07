@@ -1,5 +1,38 @@
 //------------------------------------------------------------------------------
-ZebraPuzzle = function ( canvas ) {
+ZebraPuzzle = function ( canvas, language ) {
+
+    var stringsEN = [
+        'The Englishman lives in the red house',
+        'The Spaniard owns a dog',
+        'The Japanese man is a painter',
+        'The Italian drinks tea',
+        'The Norwegian lives in the first house on the left',
+        'The green house is on the right of the white one',
+        'The photographer breeds snails',
+        'The diplomat lives in the yellow house',
+        'Milk is drunk in the middle house',
+        'The owner of the green house drinks coffee',
+        'The Norwegian\'s house is next to the blue one',
+        'The violinist drinks orange juice',
+        'The fox is in a house next to that of the physician',
+        'The horse is in a house next to the diplomat'
+    ];
+    var stringsES = [
+        'El ingl\xE9s vive en la casa roja',
+        'El espa\xF1ol tiene un perro',
+        'El japon\xE9s es un pintor',
+        'El italiano toma t\xE9',
+        'El noruego vive en la primera casa a la izquierda',
+        'La casa verde est\xE1 a la derecha de la blanca',
+        'El fot\xF3grafo cria caracoles',
+        'El diplom\xE1tico vive en la casa amarilla',
+        'Toman leche en la casa del medio',
+        'El due\xF1o de la casa verde toma caf\xE9',
+        'La casa del noruego est\xE1 al lado de la casa azul',
+        'El violinista toma jugo de naranja',
+        'El zorro est\xE1 en la casa al lado del doctor',
+        'El caballo est\xE1 en la casa al lado del diplom\xE1tico'
+    ];
 
     // Initial state
     var colors = ['Red', 'Yellow', 'Green', 'White', 'Blue'];
@@ -22,6 +55,7 @@ ZebraPuzzle = function ( canvas ) {
 
     this.m_row = -1;
     this.m_col = -1;
+    this.m_loaded = false;
 
     // Register events
     var myself = this;
@@ -35,54 +69,79 @@ ZebraPuzzle = function ( canvas ) {
     this.m_width = canvas.width = 350;
     canvas.height = 265 + 280;
 
+    this.m_context.fillStyle = 'red';
+    this.m_context.fillRect( 0, 0, canvas.width, canvas.height );
+    this.m_context.fillStyle = 'yellow';
+    this.m_context.font = '12px Verdana';
+    this.m_context.fillText( 'Loading...', 150, 260 );
+
     var conditions = [];
-    conditions.push( new PuzzleCondition( this.m_context, 'The Englishman lives in the red house', 0, 350, function () {
+    var strings = ( language === 'es' ) ? stringsES : stringsEN;
+    
+    // The Englishman lives in the red house
+    conditions.push( new PuzzleCondition( this.m_context, strings[0], 0, 350, function () {
         return myself.m_matrix[1].indexOf( 'England' ) === myself.m_matrix[0].indexOf( 'Red' );
     } ) );
-    conditions.push( new PuzzleCondition( this.m_context, 'The Spaniard owns a dog', 1, 350, function () {
+    // The Spaniard owns a dog
+    conditions.push( new PuzzleCondition( this.m_context, strings[1], 1, 350, function () {
         return myself.m_matrix[1].indexOf( 'Spain' ) === myself.m_matrix[3].indexOf( 'Dog' );
     } ) );
-    conditions.push( new PuzzleCondition( this.m_context, 'The Japanese man is a painter', 2, 350, function () {
+    // The Japanese man is a painter
+    conditions.push( new PuzzleCondition( this.m_context, strings[2], 2, 350, function () {
         return myself.m_matrix[1].indexOf( 'Japan' ) === myself.m_matrix[2].indexOf( 'Painter' );
     } ) );
-    conditions.push( new PuzzleCondition( this.m_context, 'The Italian drinks tea', 3, 350, function () {
+    // The Italian drinks tea
+    conditions.push( new PuzzleCondition( this.m_context, strings[3], 3, 350, function () {
         return myself.m_matrix[1].indexOf( 'Italy' ) === myself.m_matrix[4].indexOf( 'Tea' );
     } ) );
-    conditions.push( new PuzzleCondition( this.m_context, 'The Norwegian lives in the first house on the left', 4, 350, function () {
+    // The Norwegian lives in the first house on the left
+    conditions.push( new PuzzleCondition( this.m_context, strings[4], 4, 350, function () {
         return myself.m_matrix[1].indexOf( 'Norway' ) === 0;
     } ) );
-    conditions.push( new PuzzleCondition( this.m_context, 'The green house is on the right of the white one', 5, 350, function () {
+    // The green house is on the right of the white one
+    conditions.push( new PuzzleCondition( this.m_context, strings[5], 5, 350, function () {
         return myself.m_matrix[0].indexOf( 'Green' ) === myself.m_matrix[0].indexOf( 'White' ) + 1;
     } ) );
-    conditions.push( new PuzzleCondition( this.m_context, 'The photographer breeds snails', 6, 350, function () {
+    // The photographer breeds snails
+    conditions.push( new PuzzleCondition( this.m_context, strings[6], 6, 350, function () {
         return myself.m_matrix[2].indexOf( 'Photographer' ) === myself.m_matrix[3].indexOf( 'Snail' );
     } ) );
-    conditions.push( new PuzzleCondition( this.m_context, 'The diplomat lives in the yellow house', 7, 350, function () {
+    // The diplomat lives in the yellow house
+    conditions.push( new PuzzleCondition( this.m_context, strings[7], 7, 350, function () {
         return myself.m_matrix[2].indexOf( 'Diplomat' ) === myself.m_matrix[0].indexOf( 'Yellow' );
     } ) );
-    conditions.push( new PuzzleCondition( this.m_context, 'Milk is drunk in the middle house', 8, 350, function () {
+    // Milk is drunk in the middle house
+    conditions.push( new PuzzleCondition( this.m_context, strings[8], 8, 350, function () {
         return myself.m_matrix[4].indexOf( 'Milk' ) === 2;
     } ) );
-    conditions.push( new PuzzleCondition( this.m_context, 'The owner of the green house drinks coffee', 9, 350, function () {
+    // The owner of the green house drinks coffee
+    conditions.push( new PuzzleCondition( this.m_context, strings[9], 9, 350, function () {
         return myself.m_matrix[0].indexOf( 'Green' ) === myself.m_matrix[4].indexOf( 'Coffee' )
     } ) );
-    conditions.push( new PuzzleCondition( this.m_context, 'The Norwegian’s house is next to the blue one', 10, 350, function () {
+    // The Norwegianâ€™s house is next to the blue one
+    conditions.push( new PuzzleCondition( this.m_context, strings[10], 10, 350, function () {
         return ( ( myself.m_matrix[1].indexOf( 'Norway' ) === myself.m_matrix[0].indexOf( 'Blue' ) + 1 )
               || ( myself.m_matrix[1].indexOf( 'Norway' ) === myself.m_matrix[0].indexOf( 'Blue' ) - 1 ) );
     } ) );
-    conditions.push( new PuzzleCondition( this.m_context, 'The violinist drinks orange juice', 11, 350, function () {
+    // The violinist drinks orange juice
+    conditions.push( new PuzzleCondition( this.m_context, strings[11], 11, 350, function () {
         return myself.m_matrix[2].indexOf( 'Violinist' ) === myself.m_matrix[4].indexOf( 'Juice' )
     } ) );
-    conditions.push( new PuzzleCondition( this.m_context, 'The fox is in a house next to that of the physician', 12, 350, function () {
+    // The fox is in a house next to that of the physician
+    conditions.push( new PuzzleCondition( this.m_context, strings[12], 12, 350, function () {
         return ( ( myself.m_matrix[3].indexOf( 'Fox' ) === myself.m_matrix[2].indexOf( 'Physician' ) + 1 )
               || ( myself.m_matrix[3].indexOf( 'Fox' ) === myself.m_matrix[2].indexOf( 'Physician' ) - 1 ) );
     } ) );
-    conditions.push( new PuzzleCondition( this.m_context, 'The horse is in a house next to that of the diplomat', 13, 350, function () {
+    // The horse is in a house next to that of the diplomat
+    conditions.push( new PuzzleCondition( this.m_context, strings[13], 13, 350, function () {
         return ( ( myself.m_matrix[3].indexOf( 'Horse' ) === myself.m_matrix[2].indexOf( 'Diplomat' ) + 1 )
               || ( myself.m_matrix[3].indexOf( 'Horse' ) === myself.m_matrix[2].indexOf( 'Diplomat' ) - 1 ) );
     } ) );
     this.m_conditions = conditions;
+}
 
+ZebraPuzzle.prototype.onLoaded = function () {
+    this.m_loaded = true;
     this.render();
 }
 
@@ -109,6 +168,10 @@ ZebraPuzzle.prototype.render = function () {
 };
 
 ZebraPuzzle.prototype.onClick = function ( x, y ) {
+    if ( !this.m_loaded ) {
+        return;
+    }
+
     var col = Math.floor( x / 70 );
     var row = Math.floor( y / 53 );
 
@@ -155,7 +218,7 @@ PuzzleCondition.prototype.render = function () {
     this.m_context.fillRect( 0, this.m_y, this.m_width, 20 );
     this.m_context.fillStyle = 'yellow';
     this.m_context.font = '12px Verdana';
-    this.m_context.fillText(( state ? '[OK] ' : '[NO] ' ) + this.m_label, 5, this.m_y + 14 );
+    this.m_context.fillText(( state ? '[\u2714] ' : '[\u2718] ' ) + this.m_label, 2, this.m_y + 14 );
     return state;
 };
 
