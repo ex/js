@@ -38,7 +38,7 @@ ZebraPuzzle = function ( canvas, language ) {
     var colors = ['Red', 'Yellow', 'Green', 'White', 'Blue'];
     var nations = ['Spain', 'Japan', 'Italy', 'England', 'Norway'];
     var jobs = ['Violinist', 'Physician', 'Photographer', 'Diplomat', 'Painter'];
-    var pets = ['Snail', 'Fox', 'Dog', 'Horse', 'Zebra'];
+    var pets = ['Snail', 'Fox', 'Zebra', 'Horse', 'Dog'];
     var drinks = ['Coffee', 'Milk', 'Water', 'Juice', 'Tea'];
     this.m_imageIndexes = colors.concat( nations, jobs, pets, drinks );
 
