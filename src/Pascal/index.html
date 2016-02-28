@@ -17,17 +17,14 @@
         }
         canvas {
             -webkit-tap-highlight-color: rgba(0,0,0,0);
+            position: absolute;
+            left: 0px;
+            top: 0px;
         }
-		div {
-		    width: 100%;
-		    height: 100%;
-		}
     </style>
 </head>
 <body onload="init()" style="background-color:#000000">
-    <div align='center'>
-        <canvas id="canvas"  width="501" height="501" > </canvas>
-    </div>
+    <canvas id="canvas" width="501" height="501"></canvas>
     <script>
         var COLORS = [
             'FF00FF', 'FF54CE', 'F574F2', 'CF7FF2', 'FA416B',
@@ -47,23 +44,28 @@
             resize( canvas );
 
             function resize( canvas ) {
-                var scale = { x: 1, y: 1 };
-                scale.x = ( window.innerWidth ) / canvas.width;
-                scale.y = ( window.innerHeight ) / canvas.height;
-                if ( scale.x < 1 || scale.y < 1 ) {
-                    scale = '1, 1';
-                }
-                else if ( scale.x < scale.y ) {
-                    scale = scale.x + ', ' + scale.x;
+
+                var toScale, scale = { x: 1, y: 1 };
+                scale.x = ( canvas.parentNode.clientWidth ) / canvas.width;
+                scale.y = ( canvas.parentNode.clientHeight ) / canvas.height;
+                if ( scale.x < scale.y ) {
+                    toScale = scale.x + ', ' + scale.x;
                 }
                 else {
-                    scale = scale.y + ', ' + scale.y;
+                    toScale = scale.y + ', ' + scale.y;
                 }
                 canvas.setAttribute( 'style', style + ' '
-                    + '-ms-transform-origin: center top; -webkit-transform-origin: center top; -moz-transform-origin: center top; '
-                    + '-o-transform-origin: center top; transform-origin: center top; -ms-transform: scale('
-                    + scale + '); -webkit-transform: scale3d(' + scale + ', 1); -moz-transform: scale(' + scale
-                    + '); -o-transform: scale(' + scale + '); transform: scale(' + scale + ');' );
+                    + '-ms-transform-origin: left top; -webkit-transform-origin: left top; -moz-transform-origin: left top; '
+                    + '-o-transform-origin: left top; transform-origin: left top; -ms-transform: scale('
+                    + toScale + '); -webkit-transform: scale3d(' + toScale + ', 1); -moz-transform: scale(' + toScale
+                    + '); -o-transform: scale(' + toScale + '); transform: scale(' + toScale + ');' );
+
+                if ( scale.x < scale.y ) {
+                    canvas.style.top = ( canvas.parentNode.clientHeight - scale.x * canvas.height ) / 2 + "px";
+                }
+                else {
+                    canvas.style.left = ( canvas.parentNode.clientWidth - scale.y * canvas.width ) / 2 + "px";
+                }
             }
 
             // Check that we can play audio
