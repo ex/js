@@ -17,17 +17,28 @@
         canvas {
             -webkit-tap-highlight-color: rgba(0,0,0,0);
         }
+		.link-div {
+			color: #7777FF;
+			font: normal 10px Verdana, sans-serif;
+			margin: 0 auto;
+		    width: 100px;
+		    height: 20px;
+		}
 		.center-div {
 			color: #777777;
 			font: normal 11px Verdana, sans-serif;
 			margin: 0 auto;
 		    width: 250px;
-		    height: 45px;
+		    height: 40px;
 		}
 		.center-footer {
 			margin: 0 auto;
 		    width: 310px;
-		    height: 30px;
+		    height: 50px;
+		}
+		.center-comments {
+			margin: 0 auto;
+		    width: 500px;
 		}
     </style>
 </head>
@@ -35,32 +46,36 @@
 	<div id="fb-root"></div>
 	<div class="center-div"><b>&iquest;D&oacute;nde va la Zebra?:</b> ordena las im&aacute;genes hasta cumplir todas las reglas</div>
 	<script>
-	  window.fbAsyncInit = function() {
-		FB.init({
-		  appId      : '1724632641086396',
-		  xfbml      : true,
-		  version    : 'v2.5'
-		});
-	  };
+	    window.fbAsyncInit = function () {
+	        FB.init( {
+	            appId: '1724632641086396',
+	            xfbml: true,
+	            version: 'v2.5'
+	        } );
+	    };
 
-	  (function(d, s, id){
-		 var js, fjs = d.getElementsByTagName(s)[0];
-		 if (d.getElementById(id)) {return;}
-		 js = d.createElement(s); js.id = id;
-		 js.src = "//connect.facebook.net/en_US/sdk.js";
-		 fjs.parentNode.insertBefore(js, fjs);
-	   }(document, 'script', 'facebook-jssdk'));
+	    ( function ( d, s, id ) {
+	        var js, fjs = d.getElementsByTagName( s )[0];
+	        if ( d.getElementById( id ) ) { return; }
+	        js = d.createElement( s ); js.id = id;
+	        js.src = "//connect.facebook.net/en_US/sdk.js";
+	        fjs.parentNode.insertBefore( js, fjs );
+	    }( document, 'script', 'facebook-jssdk' ) );
 	</script>
     <div align="center">
         <canvas id="canvas"></canvas>
         <img id="zebra_sprites" src="images/zebra_sprites.png" width="0" height="0" onload="onImageLoad()"/>
     </div>
+	<div class="link-div"><a href="index_en.html">English version</a></div>
 	<div class="center-footer">
 		<div class="fb-like" data-href="http://104.131.147.200/demos/zebra/" data-action="like" data-show-faces="true" data-share="true"></div>
 	</div>
+	<div class="center-comments">
+		<div class="fb-comments" data-href="http://104.131.147.200/demos/zebra/" data-width="500" data-numposts="5"></div>
+	</div>
     <script>
-		var canvas = document.getElementById( "canvas" );
-		var puzzle = new ZebraPuzzle( canvas, "es" );
+        var canvas = document.getElementById( "canvas" );
+        var puzzle = new ZebraPuzzle( canvas, "es" );
 
         function onImageLoad() {
             puzzle.onLoaded();

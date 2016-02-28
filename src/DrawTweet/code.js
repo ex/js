@@ -20,6 +20,11 @@ function hexColor( c ) {
 }
 
 function redraw() {
+
+    window['dataRed'] = null;
+    window['dataGreen'] = null;
+    window['dataBlue'] = null;
+
     var i, j;
     var canvasData = ctx.getImageData( 0, 0, canvasWidth, canvasHeight );
 
@@ -38,8 +43,9 @@ function redraw() {
     else {
         for ( j = 0; j < canvasHeight; j++ ) {
             for ( i = 0; i < canvasWidth; i++ ) {
-                ctx.fillStyle = '#' + hexColor( window['red']( i, j ) ) + hexColor( window['green']( i, j ) )
-                                    + hexColor( window['blue']( i, j ) );
+                ctx.fillStyle = '#' + hexColor( window['red']( 2 * i, 2 * j ) )
+                                    + hexColor( window['green']( 2 * i, 2 * j ) )
+                                    + hexColor( window['blue']( 2 * i, 2 * j ) );
                 ctx.fillRect( i, j, 1, 1 );
             }
         }
@@ -47,9 +53,9 @@ function redraw() {
 }
 
 function onSelectEquation( index ) {
-    window['red'] = window['redFunctions'][index];
-    window['green'] = window['greenFunctions'][index];
-    window['blue'] = window['blueFunctions'][index];
+    window['red'] = window['mathFunctions'][index][0];
+    window['green'] = window['mathFunctions'][index][1];
+    window['blue'] = window['mathFunctions'][index][2];
     textRed.setContent( window['red'].toString() );
     textGreen.setContent( window['green'].toString() );
     textBlue.setContent( window['blue'].toString() );
@@ -128,6 +134,13 @@ DrawTweet.start = function () {
             var index = select.getSelectedIndex();
             onSelectEquation( index );
         } );
+
+    document.addEventListener( "keypress",
+        function ( e ) {
+            if ( e.ctrlKey && ( e.charCode === 10 ) ) {
+                onCompileEquations();
+            }
+    } );
 }
 
 goog.exportSymbol( 'DrawTweet.start', DrawTweet.start );
