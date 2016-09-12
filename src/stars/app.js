@@ -44,33 +44,79 @@ var Vector = (function () {
     return Vector;
 }());
 var Renderer = (function () {
-    function Renderer(width, height) {
+    function Renderer(element, width, height) {
+        this.RADIUS = 100;
         Renderer.instance = this;
-        this.width = width;
-        this.height = height;
-        this.ox = width / 2;
-        this.oy = height / 2;
-        this.scale = width / 30;
+        this.onResize(width, height);
         this.theta = 0;
+        this.phi = 0;
+        this.gamma = 0;
+        this.speedTheta = 0;
+        this.speedPhi = 0;
+        this.speedGamma = 0;
         this.renderer = PIXI.autoDetectRenderer(width, height, { antialias: true });
-        document.body.appendChild(this.renderer.view);
+        var el = document.getElementById(element);
+        el.appendChild(this.renderer.view);
         // Create the root of the scene graph
         this.stage = new PIXI.Container();
-        this.stage.interactive = true;
         this.graphics = new PIXI.Graphics();
+        this.graphics.width = width;
+        this.graphics.height = height;
+        this.graphics.interactive = true;
+        this.graphics.on('mousedown', this.onTouchDown, this);
+        this.graphics.on('touchdown', this.onTouchDown, this);
+        this.graphics.on('mouseup', this.onTouchUp, this);
+        this.graphics.on('touchup', this.onTouchUp, this);
         this.stage.addChild(this.graphics);
         Renderer.update();
     }
     Renderer.prototype.render = function () {
+        this.theta += this.speedTheta;
+        this.phi += this.speedPhi;
+        this.gamma += this.speedGamma;
         this.graphics.clear();
-        this.theta += 0.004;
+        this.graphics.beginFill(0x000010);
+        this.graphics.drawRect(this.offsetX, this.offsetY, this.size, this.size);
         for (var _i = 0, STARS_1 = STARS; _i < STARS_1.length; _i++) {
             var star = STARS_1[_i];
             var p = this.toWorld(star['x'], star['y'], star['z']);
             p = this.rotateZ(p, this.theta);
+            p = this.rotateX(p, this.phi);
+            p = this.rotateY(p, this.gamma);
             this.drawStar(this.graphics, this.fromWorldToScreen(p));
         }
         this.renderer.render(this.stage);
+    };
+    Renderer.prototype.onTouchDown = function (event) {
+        var dx = event.data.global.x - this.centerX;
+        if ((dx > this.RADIUS) || (dx < -this.RADIUS)) {
+            this.speedTheta = 0.1 * dx / this.size;
+        }
+        else {
+            var dy = event.data.global.y - this.centerY;
+            if ((dy > this.RADIUS) || (dy < -this.RADIUS)) {
+                this.speedPhi = 0.1 * dy / this.size;
+            }
+            else {
+                this.speedGamma = 0.01;
+            }
+        }
+    };
+    Renderer.prototype.onTouchUp = function (event) {
+        this.speedTheta = 0;
+        this.speedPhi = 0;
+        this.speedGamma = 0;
+    };
+    Renderer.prototype.onResize = function (width, height) {
+        this.size = (height < width) ? height : width;
+        this.offsetX = (width - this.size) / 2;
+        this.offsetY = (height - this.size) / 2;
+        this.centerX = this.offsetX + this.size / 2;
+        this.centerY = this.offsetY + this.size / 2;
+        this.scale = this.size / 30;
+        if (this.renderer) {
+            this.renderer.resize(width, height);
+        }
     };
     Renderer.update = function () {
         Renderer.instance.render();
@@ -86,12 +132,27 @@ var Renderer = (function () {
         var sinTheta = Math.sin(theta);
         return new Vector(p.x * cosTheta - p.y * sinTheta, p.y * cosTheta + p.x * sinTheta, p.z);
     };
+    // Rotates point [p] along the y-axis an angle gamma
+    Renderer.prototype.rotateY = function (p, gamma) {
+        var cosGamma = Math.cos(gamma);
+        var sinGamma = Math.sin(gamma);
+        return new Vector(p.x * cosGamma - p.z * sinGamma, p.y, p.z * cosGamma + p.x * sinGamma);
+    };
+    // Rotates point [p] along the x-axis an angle phi
+    Renderer.prototype.rotateX = function (p, phi) {
+        var cosPhi = Math.cos(phi);
+        var sinPhi = Math.sin(phi);
+        return new Vector(p.x, p.y * cosPhi + p.z * sinPhi, p.z * cosPhi - p.y * sinPhi);
+    };
     Renderer.prototype.fromWorldToScreen = function (world) {
-        return new Vector(this.ox + world.x, this.oy + world.z);
+        return new Vector(this.centerX + world.x, this.centerY - world.z);
     };
     Renderer.prototype.drawStar = function (graphics, screen) {
         graphics.lineStyle(0);
-        graphics.beginFill(0xFFFFFF, 0.3);
+        graphics.beginFill(0xFFFF00, 0.15);
+        graphics.drawCircle(screen.x, screen.y, 4);
+        graphics.endFill();
+        graphics.beginFill(0xFFFFAA, 0.4);
         graphics.drawCircle(screen.x, screen.y, 2);
         graphics.endFill();
         graphics.beginFill(0xFFFFFF, 1);
@@ -101,6 +162,11 @@ var Renderer = (function () {
     return Renderer;
 }());
 window.onload = function () {
-    var renderer = new Renderer(500, 500);
+    var renderer = new Renderer('content', window.innerWidth, window.innerHeight);
+};
+window.onresize = function () {
+    if (Renderer.instance) {
+        Renderer.instance.onResize(window.innerWidth, window.innerHeight);
+    }
 };
 //# sourceMappingURL=app.js.map

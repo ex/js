@@ -36,9 +36,10 @@ var STARS = [
 ];
 
 class Vector {
-    x: number;
-    y: number;
-    z: number;
+
+    public x: number;
+    public y: number;
+    public z: number;
 
     constructor( x: number = 0, y: number = 0, z: number = 0 ) {
         this.x = x;
@@ -49,41 +50,37 @@ class Vector {
 
 class Renderer {
 
-    renderer: PIXI.SystemRenderer;
-    stage: PIXI.Container;
-    graphics: PIXI.Graphics;
+    public static instance: Renderer;
 
-    ox: number;
-    oy: number;
-
-    width: number;
-    height: number;
-
-    scale: number;
-    theta: number;
-
-    static instance: Renderer;
-
-    constructor( width:number, height:number ) {
+    constructor( element: string, width: number, height: number ) {
 
         Renderer.instance = this;
-        this.width = width;
-        this.height = height;
 
-        this.ox = width / 2;
-        this.oy = height / 2;
+        this.onResize( width, height );
 
-        this.scale = width / 30;
         this.theta = 0;
+        this.phi = 0;
+        this.gamma = 0;
+        this.speedTheta = 0;
+        this.speedPhi = 0;
+        this.speedGamma = 0;
 
         this.renderer = PIXI.autoDetectRenderer( width, height, { antialias: true });
-        document.body.appendChild( this.renderer.view );
+        var el = document.getElementById( element );
+        el.appendChild( this.renderer.view );
 
         // Create the root of the scene graph
         this.stage = new PIXI.Container();
-        this.stage.interactive = true;
-
+        
         this.graphics = new PIXI.Graphics();
+        this.graphics.width = width;
+        this.graphics.height = height;
+        this.graphics.interactive = true;
+        this.graphics.on( 'mousedown', this.onTouchDown, this );
+        this.graphics.on( 'touchdown', this.onTouchDown, this );
+        this.graphics.on( 'mouseup', this.onTouchUp, this );
+        this.graphics.on( 'touchup', this.onTouchUp, this );
+
         this.stage.addChild( this.graphics );
 
         Renderer.update();
@@ -91,16 +88,60 @@ class Renderer {
 
     private render() {
 
-        this.graphics.clear();
+        this.theta += this.speedTheta;
+        this.phi += this.speedPhi;
+        this.gamma += this.speedGamma;
 
-        this.theta += 0.004;
+        this.graphics.clear();
+        this.graphics.beginFill( 0x000010 );
+        this.graphics.drawRect( this.offsetX, this.offsetY, this.size, this.size );
+
         for ( let star of STARS ) {
             var p = this.toWorld( star['x'], star['y'], star['z'] );
             p = this.rotateZ( p, this.theta );
+            p = this.rotateX( p, this.phi );
+            p = this.rotateY( p, this.gamma );
             this.drawStar( this.graphics, this.fromWorldToScreen( p ) );
         }
-
         this.renderer.render( this.stage );
+    }
+
+    private onTouchDown( event ) {
+        var dx = event.data.global.x - this.centerX;
+        if ( ( dx > this.RADIUS ) || ( dx < -this.RADIUS ) ) {
+            this.speedTheta = 0.1 * dx / this.size;
+        }
+        else {
+            var dy = event.data.global.y - this.centerY;
+            if ( ( dy > this.RADIUS ) || ( dy < -this.RADIUS ) ) {
+                this.speedPhi = 0.1 * dy / this.size;
+            }
+            else {
+                this.speedGamma = 0.01;
+            }
+        }
+    }
+
+    private onTouchUp( event ) {
+        this.speedTheta = 0;
+        this.speedPhi = 0;
+        this.speedGamma = 0;
+    }
+
+    public onResize( width: number, height: number ) {
+
+        this.size = ( height < width ) ? height : width;
+        this.offsetX = ( width - this.size ) / 2;
+        this.offsetY = ( height - this.size ) / 2;
+
+        this.centerX = this.offsetX + this.size / 2;
+        this.centerY = this.offsetY + this.size / 2;
+
+        this.scale = this.size / 30;
+
+        if ( this.renderer ) {
+            this.renderer.resize( width, height );
+        }
     }
 
     static update() {
@@ -109,7 +150,7 @@ class Renderer {
     }
 
     // Scale star coordinates to world coordinates 
-    private toWorld( x:number, y:number, z:number ): Vector {
+    private toWorld( x: number, y: number, z: number ): Vector {
         return new Vector( this.scale * x, this.scale * y, this.scale * z );
     }
 
@@ -120,21 +161,66 @@ class Renderer {
         return new Vector( p.x * cosTheta - p.y * sinTheta, p.y * cosTheta + p.x * sinTheta, p.z );
     }
 
-    private fromWorldToScreen( world: Vector ): Vector {
-        return new Vector( this.ox + world.x, this.oy + world.z );
+    // Rotates point [p] along the y-axis an angle gamma
+    private rotateY( p: Vector, gamma: number ): Vector {
+        var cosGamma = Math.cos( gamma );
+        var sinGamma = Math.sin( gamma );
+        return new Vector( p.x * cosGamma - p.z * sinGamma, p.y, p.z * cosGamma + p.x * sinGamma );
     }
 
-    private drawStar( graphics: PIXI.Graphics, screen:Vector ) {
+    // Rotates point [p] along the x-axis an angle phi
+    private rotateX( p: Vector, phi: number ): Vector {
+        var cosPhi = Math.cos( phi );
+        var sinPhi = Math.sin( phi );
+        return new Vector( p.x, p.y * cosPhi + p.z * sinPhi, p.z * cosPhi - p.y * sinPhi );
+    }
+
+    private fromWorldToScreen( world: Vector ): Vector {
+        return new Vector( this.centerX + world.x, this.centerY - world.z );
+    }
+
+    private drawStar( graphics: PIXI.Graphics, screen: Vector ) {
         graphics.lineStyle( 0 );
-        graphics.beginFill( 0xFFFFFF, 0.3 );
+        graphics.beginFill( 0xFFFF00, 0.15 );
+        graphics.drawCircle( screen.x, screen.y, 4 );
+        graphics.endFill();
+        graphics.beginFill( 0xFFFFAA, 0.4 );
         graphics.drawCircle( screen.x, screen.y, 2 );
         graphics.endFill();
         graphics.beginFill( 0xFFFFFF, 1 );
         graphics.drawCircle( screen.x, screen.y, 1 );
         graphics.endFill();
     }
+
+    private renderer: PIXI.SystemRenderer;
+    private stage: PIXI.Container;
+    private graphics: PIXI.Graphics;
+
+    private size: number;
+    private offsetX: number;
+    private offsetY: number;
+    private centerX: number;
+    private centerY: number;
+
+    private scale: number;
+
+    private theta: number;
+    private phi: number;
+    private gamma: number;
+
+    private speedTheta: number;
+    private speedPhi: number;
+    private speedGamma: number;
+
+    readonly RADIUS: number = 100;
 }
 
 window.onload = () => {
-    var renderer = new Renderer( 500, 500 );
+    var renderer = new Renderer( 'content', window.innerWidth, window.innerHeight );
 };
+
+window.onresize = () => {
+    if ( Renderer.instance ) {
+        Renderer.instance.onResize( window.innerWidth, window.innerHeight );
+    }
+}
