@@ -1,0 +1,1 @@
+mklink /D F:\dvx\js\src\stars\lib F:\dvx\js\lib
