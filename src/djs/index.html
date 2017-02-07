@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>DJS</title>
+    <link rel="stylesheet" href="app.css" type="text/css" />
+
+    <script src="lib/pixi/pixi.js"></script>
+    <script src="lib/soundjs/preloadjs-0.6.2.min.js"></script>
+    <script src="lib/soundjs/soundjs-0.6.2.min.js"></script>
+
+    <script src="main.js"></script>
+</head>
+<body onload="init()" style="background-color:#000000">
+    <div id="content"></div>
+    <script>
+        var sound = null;
+
+        function init() {
+
+            // Check that we can play audio
+            if ( !createjs.Sound.initializeDefaultPlugins() ) {
+                return;
+            }
+
+            var audioPath = '';
+            var manifest = [
+                { id: 'Music', src: 'natali.ogg' },
+            ];
+            var queue = new createjs.LoadQueue();
+            createjs.LoadQueue.loadTimeout = 12000;
+            createjs.Sound.alternateExtensions = ['mp3'];
+            queue.installPlugin( createjs.Sound );
+            queue.addEventListener( 'fileload', onSoundLoaded );
+            queue.addEventListener( 'error', onErrorLoading );
+            queue.loadManifest( manifest );
+        }
+
+        function onErrorLoading( event ) {
+            canvas.removeEventListener( 'click', onClick, false );
+        }
+
+        function onSoundLoaded( event ) {
+            sound = createjs.Sound.play( 'Music', { loop: -1, volume: 0.75 } );
+            var renderer = new djs.Renderer( 'content', window.innerWidth, window.innerHeight );
+        }
+    </script>
+</body>
+</html>
