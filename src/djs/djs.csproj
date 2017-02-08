@@ -25,12 +25,25 @@
     <Content Include="app.css" />
     <Content Include="index.html" />
     <Content Include="lib\pixi\pixi.js" />
+    <Content Include="lib\soundjs\flashaudioplugin-0.6.2.combined.js" />
+    <Content Include="lib\soundjs\flashaudioplugin-0.6.2.min.js" />
+    <Content Include="lib\soundjs\FlashAudioPlugin.swf" />
+    <Content Include="lib\soundjs\preloadjs-0.6.2.combined.js" />
+    <Content Include="lib\soundjs\preloadjs-0.6.2.min.js" />
+    <Content Include="lib\soundjs\soundjs-0.6.2.combined.js" />
+    <Content Include="lib\soundjs\soundjs-0.6.2.min.js" />
     <Content Include="main.js" />
+    <None Include="media\natali\hombre_mar.json" />
+    <Content Include="media\natali\hombre_mar.mp3" />
+    <Content Include="media\natali\hombre_mar.png" />
     <Content Include="natali.mp3" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="djs\Renderer.ts" />
+    <TypeScriptCompile Include="lib\soundjs\createjs-lib.d.ts" />
+    <TypeScriptCompile Include="lib\soundjs\preload.d.ts" />
+    <TypeScriptCompile Include="lib\soundjs\soundjs.d.ts" />
     <TypeScriptCompile Include="main.ts" />
     <TypeScriptCompile Include="djs\Event.ts" />
     <TypeScriptCompile Include="djs\Modifier.ts" />
@@ -39,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="natali.ogg" />
+    <Content Include="media\natali\hombre_mar.ogg" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

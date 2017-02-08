@@ -1,11 +1,34 @@
 ﻿
+///<reference path="lib/soundjs/soundjs.d.ts"/>
 
-//window.onload = () => {
-//    var renderer = new djs.Renderer( 'content', window.innerWidth, window.innerHeight );
-//};
+var timeline = null;
+
+window.onload = () => {
+
+    // Check that we can play audio
+    if ( !createjs.Sound.initializeDefaultPlugins() ) {
+        alert( 'Error initializing audio plugins' );
+        return;
+    }
+
+    var timeline: djs.Timeline = new djs.Timeline( 'content' );
+    timeline.load( 'media/natali/', 'hombre_mar.json' );
+
+    var oldTime = Date.now();
+    var update = function() {
+
+        var newTime = Date.now();
+        var timeDelta = newTime - oldTime;
+        oldTime = newTime;
+        timeline.update( timeDelta );
+
+        window.requestAnimationFrame( update );
+    }
+    update();
+};
 
 window.onresize = () => {
-    if ( djs.Renderer.instance ) {
-        djs.Renderer.instance.onResize( window.innerWidth, window.innerHeight );
+    if ( timeline ) {
+        timeline.onResize( window.innerWidth, window.innerHeight );
     }
 }

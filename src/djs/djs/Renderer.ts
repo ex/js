@@ -1,4 +1,5 @@
-﻿///<reference path="../lib/pixi/pixi.js.d.ts"/>
+﻿
+///<reference path="../lib/pixi/pixi.js.d.ts"/>
 
 namespace djs {
 
@@ -8,20 +9,13 @@ namespace djs {
 
     export class Renderer {
 
-        public static instance: Renderer;
-
         constructor( element: string, width: number, height: number ) {
 
-            Renderer.instance = this;
-
-            this.onResize( width, height );
-
-            this.renderer = PIXI.autoDetectRenderer( width, height, { antialias: true });
             var el = document.getElementById( element );
-            el.appendChild( this.renderer.view );
-
-            // Create the root of the scene graph
-            this.stage = new PIXI.Container();
+            var app = new PIXI.Application( width, height, { backgroundColor: 0x104090 });
+            el.appendChild( app.view );
+            this.stage = app.stage;
+            this.renderer = app.renderer;
 
             this.graphics = new PIXI.Graphics();
             this.graphics.width = width;
@@ -38,11 +32,17 @@ namespace djs {
             this.nodes = {};
             this.nodeCount = 0;
             this.defaultPosition = new PIXI.Point();
-            this.oldTime = Date.now();
 
-            this.timeline = new djs.Timeline( this );
-
-            Renderer.update();
+            // Debug text
+            var style = new PIXI.TextStyle( {
+                fontFamily: 'Lucida Console',
+                fontSize: 18,
+                fill: '#FF0000',
+            });
+            this.debugText = new PIXI.Text( '', style );
+            this.debugText.x = 10;
+            this.debugText.y = 10;
+            this.stage.addChild( this.debugText );
         }
 
         public createTextStyle( name: string, font: string, size: number,
@@ -84,9 +84,9 @@ namespace djs {
             this.defaultTextStyle = style;
         }
 
-        public createText( text: string, position: PIXI.Point = null ): string {
+        public createText( text: string, position: PIXI.Point = null ): number {
 
-            var id = 't' + this.nodeCount++;
+            var id = this.nodeCount++;
             var richText = new PIXI.Text( text, this.defaultTextStyle );
             richText.x = position ? position.x : this.defaultPosition.x;
             richText.y = position ? position.y : this.defaultPosition.y;
@@ -108,13 +108,18 @@ namespace djs {
             this.nodes = {};
         }
 
-        private render() {
+        public deleteNode( idNode: number ) {
+            if ( this.nodes[idNode] ) {
+                this.stage.removeChild( this.nodes[idNode].node );
+                this.nodes[idNode] = null;
+            }
+        }
 
-            var newTime = Date.now();
-            var timeDelta = newTime - this.oldTime;
-            this.oldTime = newTime;
-            this.timeline.update( timeDelta );
+        public setDebugText( text ) {
+            this.debugText.text = text;
+        }
 
+        public render() {
             this.renderer.render( this.stage );
         }
 
@@ -130,11 +135,6 @@ namespace djs {
             }
         }
 
-        static update() {
-            Renderer.instance.render();
-            window.requestAnimationFrame( Renderer.update );
-        }
-
         private renderer: PIXI.SystemRenderer;
         private stage: PIXI.Container;
         private graphics: PIXI.Graphics;
@@ -143,10 +143,9 @@ namespace djs {
         private defaultTextStyle: PIXI.TextStyle;
         private defaultPosition: PIXI.Point;
 
-        private nodes: { [id: string]: RenderElement };
+        private nodes: { [id: number]: RenderElement };
         private nodeCount: number;
 
-        private timeline: djs.Timeline;
-        private oldTime: number;
+        private debugText: PIXI.Text;
     }
 }
