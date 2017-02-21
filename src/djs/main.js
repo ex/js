@@ -254,7 +254,8 @@ var djs;
             this.loaded = true;
         };
         Timeline.prototype.onSoundError = function (event) {
-            console.log('onSoundError');
+            this.loaded = true;
+            //console.log( 'onSoundError' );
         };
         Timeline.prototype.load = function (mediaPath, songFile) {
             var self = this;

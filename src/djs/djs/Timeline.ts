@@ -52,7 +52,8 @@ namespace djs {
         }
 
         public onSoundError( event ) {
-            console.log( 'onSoundError' );
+            this.loaded = true;
+            //console.log( 'onSoundError' );
         }
 
         public load( mediaPath: string, songFile: string ) {

@@ -1,24 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2012 for Web
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "demos", ".", "{C2394A7F-A0CA-48B4-905C-DE34F4685262}"
+# Visual Studio 2012
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "js", ".", "{C2394A7F-A0CA-48B4-905C-DE34F4685262}"
 	ProjectSection(WebsiteProperties) = preProject
+		Frontpage = "false"
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
 		Debug.AspNetCompiler.VirtualPath = "/browser"
-		Debug.AspNetCompiler.PhysicalPath = "."
+		Debug.AspNetCompiler.PhysicalPath = "..\js\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\browser\"
 		Debug.AspNetCompiler.Updateable = "true"
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.VirtualPath = "/browser"
-		Release.AspNetCompiler.PhysicalPath = "."
+		Release.AspNetCompiler.PhysicalPath = "..\js\"
 		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\browser\"
 		Release.AspNetCompiler.Updateable = "true"
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "58168"
+		VWDPort = "55767"
 	EndProjectSection
 EndProject
 Global
