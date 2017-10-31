@@ -53,7 +53,7 @@ namespace djs {
 
         public onSoundError( event ) {
             this.loaded = true;
-            //console.log( 'onSoundError' );
+            console.warn( 'onSoundError' );
         }
 
         public load( mediaPath: string, songFile: string ) {
@@ -76,7 +76,7 @@ namespace djs {
         }
 
         public playAudio( audioTag: string ) {
-            createjs.Sound.play( audioTag, { volume: 1.0 });
+            createjs.Sound.play( audioTag, { volume: 0.2 });
         }
 
         public addEvent( event: Event ) {

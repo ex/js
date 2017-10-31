@@ -1,12 +1,17 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 ///<reference path="../lib/pixi/pixi.js.d.ts"/>
 var djs;
 (function (djs) {
-    var Renderer = (function () {
+    var Renderer = /** @class */ (function () {
         function Renderer(element, width, height) {
             var el = document.getElementById(element);
             var app = new PIXI.Application(width, height, { backgroundColor: 0x104090 });
@@ -146,7 +151,7 @@ window.onresize = function () {
 };
 var djs;
 (function (djs) {
-    var Event = (function () {
+    var Event = /** @class */ (function () {
         function Event(timeline, timeStart) {
             this.time = timeStart;
             this.timeline = timeline;
@@ -156,7 +161,7 @@ var djs;
         return Event;
     }());
     djs.Event = Event;
-    var EventTextCreation = (function (_super) {
+    var EventTextCreation = /** @class */ (function (_super) {
         __extends(EventTextCreation, _super);
         function EventTextCreation(timeline, timeStart, timeEnd, text) {
             var _this = _super.call(this, timeline, timeStart) || this;
@@ -171,7 +176,7 @@ var djs;
         return EventTextCreation;
     }(Event));
     djs.EventTextCreation = EventTextCreation;
-    var EventPlayAudio = (function (_super) {
+    var EventPlayAudio = /** @class */ (function (_super) {
         __extends(EventPlayAudio, _super);
         function EventPlayAudio(timeline, timeStart, audioTag) {
             var _this = _super.call(this, timeline, timeStart) || this;
@@ -184,7 +189,7 @@ var djs;
         return EventPlayAudio;
     }(Event));
     djs.EventPlayAudio = EventPlayAudio;
-    var EventDeletion = (function (_super) {
+    var EventDeletion = /** @class */ (function (_super) {
         __extends(EventDeletion, _super);
         function EventDeletion(timeline, timeStart, idNode) {
             var _this = _super.call(this, timeline, timeStart) || this;
@@ -200,7 +205,7 @@ var djs;
 })(djs || (djs = {}));
 var djs;
 (function (djs) {
-    var Modifier = (function () {
+    var Modifier = /** @class */ (function () {
         function Modifier() {
         }
         Modifier.prototype.onStart = function () {
@@ -215,7 +220,7 @@ var djs;
 ///<reference path="../lib/soundjs/soundjs.d.ts"/>
 var djs;
 (function (djs) {
-    var Timeline = (function () {
+    var Timeline = /** @class */ (function () {
         function Timeline(element) {
             this.events = new Array();
             this.time = 0;
@@ -255,7 +260,7 @@ var djs;
         };
         Timeline.prototype.onSoundError = function (event) {
             this.loaded = true;
-            //console.log( 'onSoundError' );
+            console.warn('onSoundError');
         };
         Timeline.prototype.load = function (mediaPath, songFile) {
             var self = this;
@@ -272,7 +277,7 @@ var djs;
             return this.renderer.createText(text);
         };
         Timeline.prototype.playAudio = function (audioTag) {
-            createjs.Sound.play(audioTag, { volume: 1.0 });
+            createjs.Sound.play(audioTag, { volume: 0.2 });
         };
         Timeline.prototype.addEvent = function (event) {
             var k = 0;

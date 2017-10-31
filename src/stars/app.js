@@ -32,7 +32,7 @@ var STARS = [
     { id: 119518, x: 10.013990966, y: -3.716279168, z: -2.922585638 },
     { id: 119585, x: 7.380761038, y: -0.583969764, z: 7.193603788 },
 ];
-var Vector = (function () {
+var Vector = /** @class */ (function () {
     function Vector(x, y, z) {
         if (x === void 0) { x = 0; }
         if (y === void 0) { y = 0; }
@@ -43,7 +43,7 @@ var Vector = (function () {
     }
     return Vector;
 }());
-var Renderer = (function () {
+var Renderer = /** @class */ (function () {
     function Renderer(element, width, height) {
         this.RADIUS = 100;
         Renderer.instance = this;
