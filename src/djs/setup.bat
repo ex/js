@@ -1,1 +1,1 @@
-mklink /D F:\dvx\js\src\djs\lib F:\dvx\js\lib
+mklink /D .\lib .\..\..\lib

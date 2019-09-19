@@ -6,13 +6,14 @@ namespace djs {
 
     export class Timeline {
 
-        constructor( element: string ) {
+        constructor( htmlElement: string ) {
 
             this.events = new Array<djs.Event>();
             this.time = 0;
-            this.loaded = false;
+            this.soundLoaded = false;
+            this.imageLoaded = false;
 
-            this.renderer = new djs.Renderer( element, window.innerWidth, window.innerHeight );
+            this.renderer = new djs.Renderer( this, htmlElement, window.innerWidth, window.innerHeight, true );
         }
 
         public onResize( width: number, height: number ) {
@@ -20,17 +21,21 @@ namespace djs {
         }
 
         public onDataLoaded( data: any ) {
-
+            // Load events
             var events = data.events;
             for ( var k = 0; k < events.length; k++ ) {
+                if ( events[k].length == 5 ) {
+                    this.events.push( new djs.EventImageCreation( this, 1000 * events[k][0], 1000 * events[k][1], events[k][2], events[k][3], events[k][4] ) );
+                }
                 if ( events[k].length == 3 ) {
                     this.events.push( new djs.EventTextCreation( this, 1000 * events[k][0], 1000 * events[k][1], events[k][2] ) );
                 }
-                else {
+                else if ( events[k].length == 4 ) {
                     this.events.push( new djs.EventPlayAudio( this, 1000 * events[k][0], events[k][2] ) );
                 }
             }
 
+            // Load sound
             var manifest = [
                 { id: data.audio, src: this.mediaPath + data.audio },
             ];
@@ -45,14 +50,24 @@ namespace djs {
                 self.onSoundError( event );
             });
             queue.loadManifest( manifest );
+
+            // Load image
+            var loader = PIXI.loader;
+            loader.add( this.mediaPath + data.image );
+            loader.load( onAssetsLoaded );
+            function onAssetsLoaded() {
+                var texture = PIXI.Texture.fromImage( self.mediaPath + data.image, false, 1, 1 );
+                self.createImage( texture, 0, 0 );
+                self.imageLoaded = true;
+            };
         }
 
         public onSoundLoaded( event ) {
-            this.loaded = true;
+            this.soundLoaded = true;
         }
 
         public onSoundError( event ) {
-            this.loaded = true;
+            this.soundLoaded = true; // play anyways
             console.warn( 'onSoundError' );
         }
 
@@ -63,7 +78,7 @@ namespace djs {
             var loader = new PIXI.loaders.Loader();
             loader.add( 'json', mediaPath + songFile );
 
-            loader.load( function( loader, res ) {
+            loader.load( function( _, res ) {
                 self.onDataLoaded( res.json.data );
             });
 
@@ -73,6 +88,10 @@ namespace djs {
 
         public createText( text: string ): number {
             return this.renderer.createText( text );
+        }
+
+        public createImage( texture: PIXI.Texture, x: number, y: number ): number {
+            return this.renderer.createImage( texture, new PIXI.Point( x, y ) );
         }
 
         public playAudio( audioTag: string ) {
@@ -93,11 +112,9 @@ namespace djs {
 
         public update( delta: number ) {
 
-            if ( !this.loaded ) {
+            if ( !this.soundLoaded || !this.imageLoaded ) {
                 return;
             }
-
-            this.renderer.setDebugText( this.time );
 
             while ( this.events.length > 0 && ( this.time >= this.events[0].time ) ) {
                 this.events[0].onTime();
@@ -107,8 +124,11 @@ namespace djs {
             this.renderer.render();
         }
 
-        private loaded: boolean;
+        public getTime(): number { return this.time; }
+
         private time: number;
+        private soundLoaded: boolean;
+        private imageLoaded: boolean;
         private events: Array<djs.Event>;
         private renderer: djs.Renderer;
         private mediaPath: string;

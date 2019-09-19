@@ -1,20 +1,108 @@
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var djs;
+(function (djs) {
+    var Event = /** @class */ (function () {
+        function Event(timeline, timeStart) {
+            this.time = timeStart;
+            this.timeline = timeline;
+        }
+        Event.prototype.onTime = function () { };
+        ;
+        return Event;
+    }());
+    djs.Event = Event;
+    var EventTextCreation = /** @class */ (function (_super) {
+        __extends(EventTextCreation, _super);
+        function EventTextCreation(timeline, timeStart, timeEnd, text) {
+            var _this = _super.call(this, timeline, timeStart) || this;
+            _this.text = text;
+            _this.timeEnd = timeEnd;
+            return _this;
+        }
+        EventTextCreation.prototype.onTime = function () {
+            var id = this.timeline.createText(this.text);
+            this.timeline.addEvent(new EventDeletion(this.timeline, this.timeEnd, id));
+        };
+        return EventTextCreation;
+    }(Event));
+    djs.EventTextCreation = EventTextCreation;
+    var EventImageCreation = /** @class */ (function (_super) {
+        __extends(EventImageCreation, _super);
+        function EventImageCreation(timeline, timeStart, timeEnd, imageTag, x, y) {
+            var _this = _super.call(this, timeline, timeStart) || this;
+            _this.image = imageTag;
+            _this.x = x;
+            _this.y = y;
+            _this.timeEnd = timeEnd;
+            return _this;
+        }
+        EventImageCreation.prototype.onTime = function () {
+            //var id = this.timeline.createImage( this.image, this.x, this.y );
+            //this.timeline.addEvent( new EventDeletion( this.timeline, this.timeEnd, id ) );
+        };
+        return EventImageCreation;
+    }(Event));
+    djs.EventImageCreation = EventImageCreation;
+    var EventPlayAudio = /** @class */ (function (_super) {
+        __extends(EventPlayAudio, _super);
+        function EventPlayAudio(timeline, timeStart, audioTag) {
+            var _this = _super.call(this, timeline, timeStart) || this;
+            _this.audio = audioTag;
+            return _this;
+        }
+        EventPlayAudio.prototype.onTime = function () {
+            this.timeline.playAudio(this.audio);
+        };
+        return EventPlayAudio;
+    }(Event));
+    djs.EventPlayAudio = EventPlayAudio;
+    var EventDeletion = /** @class */ (function (_super) {
+        __extends(EventDeletion, _super);
+        function EventDeletion(timeline, timeStart, idNode) {
+            var _this = _super.call(this, timeline, timeStart) || this;
+            _this.idNode = idNode;
+            return _this;
+        }
+        EventDeletion.prototype.onTime = function () {
+            this.timeline.deleteNode(this.idNode);
+        };
+        return EventDeletion;
+    }(Event));
+    djs.EventDeletion = EventDeletion;
+})(djs || (djs = {}));
+var djs;
+(function (djs) {
+    var Modifier = /** @class */ (function () {
+        function Modifier() {
+        }
+        Modifier.prototype.onStart = function () {
+        };
+        Modifier.prototype.onEnd = function () {
+        };
+        return Modifier;
+    }());
+    djs.Modifier = Modifier;
+})(djs || (djs = {}));
 ///<reference path="../lib/pixi/pixi.js.d.ts"/>
 var djs;
 (function (djs) {
     var Renderer = /** @class */ (function () {
-        function Renderer(element, width, height) {
-            var el = document.getElementById(element);
-            var app = new PIXI.Application(width, height, { backgroundColor: 0x104090 });
+        function Renderer(parent, htmlElement, width, height, debug) {
+            this.parent = parent;
+            var el = document.getElementById(htmlElement);
+            var app = new PIXI.Application(width, height, { backgroundColor: 0 });
             el.appendChild(app.view);
             this.stage = app.stage;
             this.renderer = app.renderer;
@@ -30,17 +118,20 @@ var djs;
             this.textStyles = {};
             this.nodes = {};
             this.nodeCount = 0;
+            this.debugMode = debug;
             this.defaultPosition = new PIXI.Point();
-            // Debug text
-            var style = new PIXI.TextStyle({
-                fontFamily: 'Lucida Console',
-                fontSize: 18,
-                fill: '#FF0000',
-            });
-            this.debugText = new PIXI.Text('', style);
-            this.debugText.x = 10;
-            this.debugText.y = 10;
-            this.stage.addChild(this.debugText);
+            if (this.debugMode) {
+                // Debug text
+                var style = new PIXI.TextStyle({
+                    fontFamily: 'Lucida Console',
+                    fontSize: 18,
+                    fill: '#FF0000',
+                });
+                this.debugText = new PIXI.Text('', style);
+                this.debugText.x = 10;
+                this.debugText.y = 10;
+                this.stage.addChild(this.debugText);
+            }
         }
         Renderer.prototype.createTextStyle = function (name, font, size, italic, bold, colorA, colorB, borderColor, borderSize, shadow, shadowColor, shadowBlur, shadowAngle, shadowDistance, wordWrap, wordWrapWidth) {
             if (colorB === void 0) { colorB = null; }
@@ -89,6 +180,14 @@ var djs;
             this.nodes[id] = { node: richText };
             return id;
         };
+        Renderer.prototype.createImage = function (texture, position) {
+            if (position === void 0) { position = null; }
+            var id = this.nodeCount++;
+            var sprite = new PIXI.Sprite(texture);
+            this.stage.addChild(sprite);
+            //this.nodes[id] = { node: sprite };
+            return id;
+        };
         Renderer.prototype.setDefaultInsertPosition = function (x, y) {
             this.defaultPosition.x = x;
             this.defaultPosition.y = y;
@@ -110,6 +209,9 @@ var djs;
         };
         Renderer.prototype.render = function () {
             this.renderer.render(this.stage);
+            if (this.debugMode) {
+                this.setDebugText(this.parent.getTime());
+            }
         };
         Renderer.prototype.onTouchDown = function (event) {
         };
@@ -123,6 +225,114 @@ var djs;
         return Renderer;
     }());
     djs.Renderer = Renderer;
+})(djs || (djs = {}));
+///<reference path="../lib/pixi/pixi.js.d.ts"/>
+///<reference path="../lib/soundjs/soundjs.d.ts"/>
+var djs;
+(function (djs) {
+    var Timeline = /** @class */ (function () {
+        function Timeline(htmlElement) {
+            this.events = new Array();
+            this.time = 0;
+            this.soundLoaded = false;
+            this.imageLoaded = false;
+            this.renderer = new djs.Renderer(this, htmlElement, window.innerWidth, window.innerHeight, true);
+        }
+        Timeline.prototype.onResize = function (width, height) {
+            this.renderer.onResize(width, height);
+        };
+        Timeline.prototype.onDataLoaded = function (data) {
+            // Load events
+            var events = data.events;
+            for (var k = 0; k < events.length; k++) {
+                if (events[k].length == 5) {
+                    this.events.push(new djs.EventImageCreation(this, 1000 * events[k][0], 1000 * events[k][1], events[k][2], events[k][3], events[k][4]));
+                }
+                if (events[k].length == 3) {
+                    this.events.push(new djs.EventTextCreation(this, 1000 * events[k][0], 1000 * events[k][1], events[k][2]));
+                }
+                else if (events[k].length == 4) {
+                    this.events.push(new djs.EventPlayAudio(this, 1000 * events[k][0], events[k][2]));
+                }
+            }
+            // Load sound
+            var manifest = [
+                { id: data.audio, src: this.mediaPath + data.audio },
+            ];
+            var self = this;
+            var queue = new createjs.LoadQueue();
+            createjs.Sound.alternateExtensions = ['mp3'];
+            queue.installPlugin(createjs.Sound);
+            queue.addEventListener('fileload', function (event) {
+                self.onSoundLoaded(event);
+            });
+            queue.addEventListener('error', function (event) {
+                self.onSoundError(event);
+            });
+            queue.loadManifest(manifest);
+            // Load image
+            var loader = PIXI.loader;
+            loader.add(this.mediaPath + data.image);
+            loader.load(onAssetsLoaded);
+            function onAssetsLoaded() {
+                var texture = PIXI.Texture.fromImage(self.mediaPath + data.image, false, 1, 1);
+                self.createImage(texture, 0, 0);
+                self.imageLoaded = true;
+            }
+            ;
+        };
+        Timeline.prototype.onSoundLoaded = function (event) {
+            this.soundLoaded = true;
+        };
+        Timeline.prototype.onSoundError = function (event) {
+            this.soundLoaded = true; // play anyways
+            console.warn('onSoundError');
+        };
+        Timeline.prototype.load = function (mediaPath, songFile) {
+            var self = this;
+            this.mediaPath = mediaPath;
+            var loader = new PIXI.loaders.Loader();
+            loader.add('json', mediaPath + songFile);
+            loader.load(function (_, res) {
+                self.onDataLoaded(res.json.data);
+            });
+            this.renderer.createTextStyle('default', 'Palatino Linotype', 50, true, true, '#55ffff', '#3366ff');
+            this.renderer.setDefaultInsertPosition(50, 400);
+        };
+        Timeline.prototype.createText = function (text) {
+            return this.renderer.createText(text);
+        };
+        Timeline.prototype.createImage = function (texture, x, y) {
+            return this.renderer.createImage(texture, new PIXI.Point(x, y));
+        };
+        Timeline.prototype.playAudio = function (audioTag) {
+            createjs.Sound.play(audioTag, { volume: 0.2 });
+        };
+        Timeline.prototype.addEvent = function (event) {
+            var k = 0;
+            while ((k < this.events.length) && (event.time > this.events[k].time)) {
+                k++;
+            }
+            this.events.splice(k, 0, event);
+        };
+        Timeline.prototype.deleteNode = function (idNode) {
+            this.renderer.deleteNode(idNode);
+        };
+        Timeline.prototype.update = function (delta) {
+            if (!this.soundLoaded || !this.imageLoaded) {
+                return;
+            }
+            while (this.events.length > 0 && (this.time >= this.events[0].time)) {
+                this.events[0].onTime();
+                this.events.shift();
+            }
+            this.time += delta;
+            this.renderer.render();
+        };
+        Timeline.prototype.getTime = function () { return this.time; };
+        return Timeline;
+    }());
+    djs.Timeline = Timeline;
 })(djs || (djs = {}));
 ///<reference path="lib/soundjs/soundjs.d.ts"/>
 var timeline = null;
@@ -149,160 +359,4 @@ window.onresize = function () {
         timeline.onResize(window.innerWidth, window.innerHeight);
     }
 };
-var djs;
-(function (djs) {
-    var Event = /** @class */ (function () {
-        function Event(timeline, timeStart) {
-            this.time = timeStart;
-            this.timeline = timeline;
-        }
-        Event.prototype.onTime = function () { };
-        ;
-        return Event;
-    }());
-    djs.Event = Event;
-    var EventTextCreation = /** @class */ (function (_super) {
-        __extends(EventTextCreation, _super);
-        function EventTextCreation(timeline, timeStart, timeEnd, text) {
-            var _this = _super.call(this, timeline, timeStart) || this;
-            _this.text = text;
-            _this.timeEnd = timeEnd;
-            return _this;
-        }
-        EventTextCreation.prototype.onTime = function () {
-            var id = this.timeline.createText(this.text);
-            this.timeline.addEvent(new EventDeletion(this.timeline, this.timeEnd, id));
-        };
-        return EventTextCreation;
-    }(Event));
-    djs.EventTextCreation = EventTextCreation;
-    var EventPlayAudio = /** @class */ (function (_super) {
-        __extends(EventPlayAudio, _super);
-        function EventPlayAudio(timeline, timeStart, audioTag) {
-            var _this = _super.call(this, timeline, timeStart) || this;
-            _this.audio = audioTag;
-            return _this;
-        }
-        EventPlayAudio.prototype.onTime = function () {
-            this.timeline.playAudio(this.audio);
-        };
-        return EventPlayAudio;
-    }(Event));
-    djs.EventPlayAudio = EventPlayAudio;
-    var EventDeletion = /** @class */ (function (_super) {
-        __extends(EventDeletion, _super);
-        function EventDeletion(timeline, timeStart, idNode) {
-            var _this = _super.call(this, timeline, timeStart) || this;
-            _this.idNode = idNode;
-            return _this;
-        }
-        EventDeletion.prototype.onTime = function () {
-            this.timeline.deleteNode(this.idNode);
-        };
-        return EventDeletion;
-    }(Event));
-    djs.EventDeletion = EventDeletion;
-})(djs || (djs = {}));
-var djs;
-(function (djs) {
-    var Modifier = /** @class */ (function () {
-        function Modifier() {
-        }
-        Modifier.prototype.onStart = function () {
-        };
-        Modifier.prototype.onEnd = function () {
-        };
-        return Modifier;
-    }());
-    djs.Modifier = Modifier;
-})(djs || (djs = {}));
-///<reference path="../lib/pixi/pixi.js.d.ts"/>
-///<reference path="../lib/soundjs/soundjs.d.ts"/>
-var djs;
-(function (djs) {
-    var Timeline = /** @class */ (function () {
-        function Timeline(element) {
-            this.events = new Array();
-            this.time = 0;
-            this.loaded = false;
-            this.renderer = new djs.Renderer(element, window.innerWidth, window.innerHeight);
-        }
-        Timeline.prototype.onResize = function (width, height) {
-            this.renderer.onResize(width, height);
-        };
-        Timeline.prototype.onDataLoaded = function (data) {
-            var events = data.events;
-            for (var k = 0; k < events.length; k++) {
-                if (events[k].length == 3) {
-                    this.events.push(new djs.EventTextCreation(this, 1000 * events[k][0], 1000 * events[k][1], events[k][2]));
-                }
-                else {
-                    this.events.push(new djs.EventPlayAudio(this, 1000 * events[k][0], events[k][2]));
-                }
-            }
-            var manifest = [
-                { id: data.audio, src: this.mediaPath + data.audio },
-            ];
-            var self = this;
-            var queue = new createjs.LoadQueue();
-            createjs.Sound.alternateExtensions = ['mp3'];
-            queue.installPlugin(createjs.Sound);
-            queue.addEventListener('fileload', function (event) {
-                self.onSoundLoaded(event);
-            });
-            queue.addEventListener('error', function (event) {
-                self.onSoundError(event);
-            });
-            queue.loadManifest(manifest);
-        };
-        Timeline.prototype.onSoundLoaded = function (event) {
-            this.loaded = true;
-        };
-        Timeline.prototype.onSoundError = function (event) {
-            this.loaded = true;
-            console.warn('onSoundError');
-        };
-        Timeline.prototype.load = function (mediaPath, songFile) {
-            var self = this;
-            this.mediaPath = mediaPath;
-            var loader = new PIXI.loaders.Loader();
-            loader.add('json', mediaPath + songFile);
-            loader.load(function (loader, res) {
-                self.onDataLoaded(res.json.data);
-            });
-            this.renderer.createTextStyle('default', 'Palatino Linotype', 50, true, true, '#55ffff', '#3366ff');
-            this.renderer.setDefaultInsertPosition(50, 400);
-        };
-        Timeline.prototype.createText = function (text) {
-            return this.renderer.createText(text);
-        };
-        Timeline.prototype.playAudio = function (audioTag) {
-            createjs.Sound.play(audioTag, { volume: 0.2 });
-        };
-        Timeline.prototype.addEvent = function (event) {
-            var k = 0;
-            while ((k < this.events.length) && (event.time > this.events[k].time)) {
-                k++;
-            }
-            this.events.splice(k, 0, event);
-        };
-        Timeline.prototype.deleteNode = function (idNode) {
-            this.renderer.deleteNode(idNode);
-        };
-        Timeline.prototype.update = function (delta) {
-            if (!this.loaded) {
-                return;
-            }
-            this.renderer.setDebugText(this.time);
-            while (this.events.length > 0 && (this.time >= this.events[0].time)) {
-                this.events[0].onTime();
-                this.events.shift();
-            }
-            this.time += delta;
-            this.renderer.render();
-        };
-        return Timeline;
-    }());
-    djs.Timeline = Timeline;
-})(djs || (djs = {}));
 //# sourceMappingURL=main.js.map

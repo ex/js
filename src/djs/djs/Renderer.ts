@@ -9,10 +9,12 @@ namespace djs {
 
     export class Renderer {
 
-        constructor( element: string, width: number, height: number ) {
+        constructor( parent: djs.Timeline, htmlElement: string, width: number, height: number, debug: boolean ) {
 
-            var el = document.getElementById( element );
-            var app = new PIXI.Application( width, height, { backgroundColor: 0x104090 });
+            this.parent = parent;
+
+            var el = document.getElementById(htmlElement);
+            var app = new PIXI.Application( width, height, { backgroundColor: 0 });
             el.appendChild( app.view );
             this.stage = app.stage;
             this.renderer = app.renderer;
@@ -31,18 +33,22 @@ namespace djs {
             this.textStyles = {};
             this.nodes = {};
             this.nodeCount = 0;
+            this.debugMode = debug;
             this.defaultPosition = new PIXI.Point();
 
-            // Debug text
-            var style = new PIXI.TextStyle( {
-                fontFamily: 'Lucida Console',
-                fontSize: 18,
-                fill: '#FF0000',
-            });
-            this.debugText = new PIXI.Text( '', style );
-            this.debugText.x = 10;
-            this.debugText.y = 10;
-            this.stage.addChild( this.debugText );
+            if (this.debugMode )
+            {
+                // Debug text
+                var style = new PIXI.TextStyle( {
+                    fontFamily: 'Lucida Console',
+                    fontSize: 18,
+                    fill: '#FF0000',
+                });
+                this.debugText = new PIXI.Text( '', style );
+                this.debugText.x = 10;
+                this.debugText.y = 10;
+                this.stage.addChild( this.debugText );
+            }
         }
 
         public createTextStyle( name: string, font: string, size: number,
@@ -96,6 +102,17 @@ namespace djs {
             return id;
         }
 
+        public createImage( texture: PIXI.Texture, position: PIXI.Point = null ): number {
+
+            var id = this.nodeCount++;
+
+            var sprite = new PIXI.Sprite( texture );
+            this.stage.addChild( sprite )
+
+            //this.nodes[id] = { node: sprite };
+            return id;
+        }
+
         public setDefaultInsertPosition( x: number, y: number ) {
             this.defaultPosition.x = x;
             this.defaultPosition.y = y;
@@ -121,6 +138,9 @@ namespace djs {
 
         public render() {
             this.renderer.render( this.stage );
+            if ( this.debugMode ) {
+                this.setDebugText( this.parent.getTime() );
+            }
         }
 
         private onTouchDown( event ) {
@@ -147,5 +167,7 @@ namespace djs {
         private nodeCount: number;
 
         private debugText: PIXI.Text;
+        private debugMode: boolean;
+        private parent: djs.Timeline;
     }
 }

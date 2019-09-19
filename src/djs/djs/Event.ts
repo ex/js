@@ -34,6 +34,27 @@ namespace djs {
         protected timeEnd: number;
     }
 
+    export class EventImageCreation extends Event {
+
+        constructor( timeline: djs.Timeline, timeStart: number, timeEnd: number, imageTag: string, x: number, y: number ) {
+            super( timeline, timeStart );
+            this.image = imageTag;
+            this.x = x;
+            this.y = y;
+            this.timeEnd = timeEnd;
+        }
+
+        public onTime() {
+            //var id = this.timeline.createImage( this.image, this.x, this.y );
+            //this.timeline.addEvent( new EventDeletion( this.timeline, this.timeEnd, id ) );
+        }
+
+        protected image: string;
+        protected x: number;
+        protected y: number;
+        protected timeEnd: number;
+    }
+
     export class EventPlayAudio extends Event {
 
         constructor( timeline: djs.Timeline, timeStart: number, audioTag: string ) {
