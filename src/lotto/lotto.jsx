@@ -1,20 +1,21 @@
 ﻿
-var LottoEntry = React.createClass( {
-    getDefaultProps: function() {
-        return {
+class LottoEntry extends React.Component {
+    constructor( props ) {
+        super( props );
+        this.state = {
             day: null,
             lotto: [0, 0, 0, 0, 0, 0]
         };
-    },
-    formatNumber: function( n, separator ) {
+    }
+    formatNumber( n, separator ) {
         if ( typeof separator === 'undefined' ) {
             return ( n < 10 ) ? '0' + n : n;
         }
         return ( n < 10 ) ? '0' + n + separator: n + separator;
-    },
-    render: function() {
+    }
+    render() {
         var dateStyle = {
-            color: '#5522FF'
+            color: '#6677FF'
         };
         var lotto = '';
         for ( var k = 0; k < this.props.lotto.length; k++ ) {
@@ -30,34 +31,33 @@ var LottoEntry = React.createClass( {
         return (
             <div><span style={dateStyle}>{day}</span>{lotto}</div>
         );
+    }
 }
-} );
 
-var LottoPlayer = React.createClass( {
-    getDefaultProps: function() {
-        return {
-            type: 'Descent',
-            timer: 1000
+class LottoPlayer extends React.Component {
+    constructor( props ) {
+        super( props );
+        this.state = {
+            type: props.type || 'Descent',
+            timer: props.timer || 1000, 
+            secondsElapsed: 0
         };
-    },
-    getInitialState: function() {
-        return { secondsElapsed: 0 };
-    },
-    tick: function() {
-        this.setState( { secondsElapsed: this.state.secondsElapsed + 1 } );
-    },
-    componentDidMount: function() {
-        this.interval = setInterval( this.tick, this.props.timer );
-    },
-    componentWillUnmount: function() {
+    }
+    tick() {
+        this.setState( state => ( { secondsElapsed: state.secondsElapsed + 1 } ) );
+    }
+    componentDidMount() {
+        this.interval = setInterval( () => this.tick(), this.state.timer );
+    }
+    componentWillUnmount() {
         clearInterval( this.interval );
-    },
-    render: function() {
+    }
+    render() {
         var date;
-        if ( this.props.type === 'Ascendant') {
+        if ( this.state.type === 'Ascendant') {
             date = g_lottoData[g_lottoData.length - 1 - ( this.state.secondsElapsed % g_lottoData.length )];
         }
-        else if ( this.props.type === 'Random') {
+        else if ( this.state.type === 'Random') {
             date = g_lottoData[Math.floor( Math.random() * g_lottoData.length )];
         }
         else {
@@ -65,40 +65,44 @@ var LottoPlayer = React.createClass( {
         }
         return (
             <div>
-                <h4> LottoPlayer {this.props.type}</h4>
+                <h4> LottoPlayer {this.state.type}</h4>
                 <div>
                     <LottoEntry day={date[0]} lotto={date[1]}/>
                 </div>
             </div>
         );
     }
-} );
+}
 
-var LottoRandom = React.createClass( {
-    getInitialState: function() {
-        return {
-            max: 40,
-            play: this.calculate( 40 )
+class LottoRandom extends React.Component {
+    constructor( props ) {
+        super( props );
+        this.state = {
+            max: 45,
+            play: this.calculate( 45 )
         };
-    },
-    calculate: function( init ) {
+        // This binding is necessary to make `this` work in the callback
+        this.handleSubmit = this.handleSubmit.bind( this );
+        this.onMaxChange = this.onMaxChange.bind( this );
+    }
+    calculate( init ) {
         var max = init ? init : this.state.max;
         var play = [];
         for ( var k = 0; k < 6; k++ ) {
             play.push( 1 + Math.floor( max * Math.random() ) );
         }
         return play;
-    },
-    handleSubmit: function( e ) {
+    }
+    handleSubmit( e ) {
         e.preventDefault();
         this.setState( { play: this.calculate() } );
-    },
-    onMaxChange: function( e ) {
+    }
+    onMaxChange( e ) {
         e.preventDefault();
         this.setState( { max: e.target.value } );
         this.setState( { play: this.calculate() } );
-    },
-    render: function() {
+    }
+    render() {
         var optionStyle = {
             width: '100px'
         };
@@ -111,8 +115,8 @@ var LottoRandom = React.createClass( {
                             <tr>
                                 <td>
                                     <select name="optMaxLotto" size="1" style={optionStyle} onChange={this.onMaxChange}>
-                                        <option value="40">40</option>
                                         <option value="45">45</option>
+                                        <option value="40">40</option>
                                         <option value="50">50</option>
                                     </select>
                                 </td>
@@ -126,16 +130,16 @@ var LottoRandom = React.createClass( {
                     </table>
                 </form>
             </div>
-    );
+        );
     }
-});
+}
 
 ReactDOM.render(
     <div>
-        <LottoRandom/><br/>
-        <LottoPlayer/><br/>
-        <LottoPlayer type={'Ascendant'}/><br/>
-        <LottoPlayer timer={500} type={'Random'}/>
+        <LottoRandom /><br />
+        <LottoPlayer /> <br />
+        <LottoPlayer type={'Ascendant'} /> <br />
+        <LottoPlayer timer={500} type={'Random'} />
     </div>
     , document.getElementById( 'container' )
 );
