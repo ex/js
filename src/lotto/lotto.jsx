@@ -55,13 +55,13 @@ class LottoPlayer extends React.Component {
     render() {
         var date;
         if ( this.state.type === 'Ascendant') {
-            date = g_lottoData[g_lottoData.length - 1 - ( this.state.secondsElapsed % g_lottoData.length )];
+            date = g_lotto.data[g_lotto.counter - 1 - ( this.state.secondsElapsed % g_lotto.counter )];
         }
         else if ( this.state.type === 'Random') {
-            date = g_lottoData[Math.floor( Math.random() * g_lottoData.length )];
+            date = g_lotto.data[Math.floor( Math.random() * g_lotto.counter )];
         }
         else {
-            date = g_lottoData[this.state.secondsElapsed % g_lottoData.length];
+            date = g_lotto.data[this.state.secondsElapsed % g_lotto.counter];
         }
         return (
             <div>
@@ -88,8 +88,37 @@ class LottoRandom extends React.Component {
     calculate( init ) {
         var max = init ? init : this.state.max;
         var play = [];
-        for ( var k = 0; k < 6; k++ ) {
-            play.push( 1 + Math.floor( max * Math.random() ) );
+        if ( max != 45 ) {
+            for ( var k = 0; k < 6; k++ ) {
+                play.push( 1 + Math.floor( max * Math.random() ) );
+            }
+        }
+        else {
+            var found = false;
+            while ( !found ) {
+                play = [];
+                // Use data
+                while ( play.length < 6 ) {
+                    var num = g_lotto.draft[Math.floor( Math.random() * g_lotto.draft.length )];
+                    if ( play.indexOf( num ) === -1 ) {
+                        play.push( num );
+                    }
+                }
+                // Sort play
+                play.sort( ( a, b ) => {
+                    return a - b;
+                } );
+                // Check that it's not repeated
+                var s = play.reduce( ( x, y ) => {
+                    return "" + ( x < 10 ? "0" + x : x ) + ( y < 10 ? "0" + y : y );
+                } );
+                if ( g_lotto.plays[s] ) {
+                    alert( "Repeated: " + s );
+                }
+                else {
+                    found = true;
+                }
+            }
         }
         return play;
     }
