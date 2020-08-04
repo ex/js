@@ -1,6 +1,6 @@
 ﻿///<reference path="lib/soundjs/soundjs.d.ts"/>
 
-// For compilation in Windows use> tsc.cmd main.ts
+// For compilation in Windows with tsconfig.json use> tsc.cmd
 var timeline: djs.Timeline;
 
 window.onload = () => {
@@ -11,7 +11,8 @@ window.onload = () => {
         return;
     }
 
-    var timeline: djs.Timeline = new djs.Timeline( 'content' );
+    timeline = new djs.Timeline( 'content' );
+    timeline.onResize();
     timeline.load( 'media/natali/', 'hombre_mar.json' );
 
     var oldTime = Date.now();
@@ -27,8 +28,7 @@ window.onload = () => {
     update();
 };
 
-window.onresize = () => {
-    if ( timeline ) {
-        timeline.onResize( window.innerWidth, window.innerHeight );
-    }
-}
+window.addEventListener( "resize", () => {
+    console.log("resize");
+    timeline.onResize();
+} );    

@@ -13,7 +13,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 ///<reference path="lib/soundjs/soundjs.d.ts"/>
-// For compilation in Windows use> tsc.cmd main.ts
+// For compilation in Windows with tsconfig.json use> tsc.cmd
 var timeline;
 window.onload = function () {
     // Check that we can play audio
@@ -21,7 +21,8 @@ window.onload = function () {
         alert('Error initializing audio plugins');
         return;
     }
-    var timeline = new djs.Timeline('content');
+    timeline = new djs.Timeline('content');
+    timeline.onResize();
     timeline.load('media/natali/', 'hombre_mar.json');
     var oldTime = Date.now();
     var update = function () {
@@ -33,11 +34,10 @@ window.onload = function () {
     };
     update();
 };
-window.onresize = function () {
-    if (timeline) {
-        timeline.onResize(window.innerWidth, window.innerHeight);
-    }
-};
+window.addEventListener("resize", function () {
+    console.log("resize");
+    timeline.onResize();
+});
 var djs;
 (function (djs) {
     var Event = /** @class */ (function () {
@@ -129,8 +129,10 @@ var djs;
 (function (djs) {
     var Renderer = /** @class */ (function () {
         function Renderer(parent, htmlElement, width, height, debug) {
+            this.WIDTH = 960;
+            this.HEIGHT = 600;
             this.parent = parent;
-            var app = new PIXI.Application(width, height, { backgroundColor: 0 });
+            var app = new PIXI.Application({ width: width, height: height, backgroundColor: 0 });
             var el = document.getElementById(htmlElement);
             if (el) {
                 el.appendChild(app.view);
@@ -247,10 +249,31 @@ var djs;
         };
         Renderer.prototype.onTouchUp = function () {
         };
-        Renderer.prototype.onResize = function (width, height) {
-            if (this.renderer) {
-                this.renderer.resize(width, height);
+        Renderer.prototype.onResize = function () {
+            var vpw = window.innerWidth; // Width of the viewport
+            var vph = window.innerHeight; // Height of the viewport
+            var nvw; // New game width
+            var nvh; // New game height
+            // The aspect ratio is the ratio of the screen's sizes in different dimensions.
+            // The height-to-width aspect ratio of the game is HEIGHT / WIDTH.
+            if (vph / vpw < this.HEIGHT / this.WIDTH) {
+                // If height-to-width ratio of the viewport is less than the height-to-width ratio
+                // of the game, then the height will be equal to the height of the viewport, and
+                // the width will be scaled.
+                nvh = vph;
+                nvw = (nvh * this.WIDTH) / this.HEIGHT;
             }
+            else {
+                // In the else case, the opposite is happening.
+                nvw = vpw;
+                nvh = (nvw * this.HEIGHT) / this.WIDTH;
+            }
+            // Set the game screen size to the new values.
+            // This command only makes the screen bigger --- it does not scale the contents of the game.
+            // There will be a lot of extra room --- or missing room --- if we don't scale the stage.
+            this.renderer.resize(nvw, nvh);
+            // This command scales the stage to fit the new size of the game.
+            this.stage.scale.set(nvw / this.WIDTH, nvh / this.HEIGHT);
         };
         return Renderer;
     }());
@@ -271,8 +294,8 @@ var djs;
             this.mediaPath = "";
             this.renderer = new djs.Renderer(this, htmlElement, window.innerWidth, window.innerHeight, true);
         }
-        Timeline.prototype.onResize = function (width, height) {
-            this.renderer.onResize(width, height);
+        Timeline.prototype.onResize = function () {
+            this.renderer.onResize();
         };
         Timeline.prototype.onDataLoaded = function (data) {
             // Load events
@@ -304,11 +327,11 @@ var djs;
             });
             queue.loadManifest(manifest);
             // Load image
-            var loader = PIXI.loader;
+            var loader = PIXI.Loader.shared;
             loader.add(this.mediaPath + data.image);
             loader.load(onAssetsLoaded);
             function onAssetsLoaded() {
-                var texture = PIXI.Texture.fromImage(self.mediaPath + data.image, false, 1, 1);
+                var texture = PIXI.Texture.from(self.mediaPath + data.image);
                 self.createImage(texture, 0, 0);
                 self.imageLoaded = true;
             }
@@ -324,13 +347,13 @@ var djs;
         Timeline.prototype.load = function (mediaPath, songFile) {
             var self = this;
             this.mediaPath = mediaPath;
-            var loader = new PIXI.loaders.Loader();
+            var loader = PIXI.Loader.shared;
             loader.add('json', mediaPath + songFile);
             loader.load(function (_, res) {
                 self.onDataLoaded(res.json.data);
             });
-            this.renderer.createTextStyle('default', 'Palatino Linotype', 50, true, true, '#55ffff', '#3366ff');
-            this.renderer.setDefaultInsertPosition(50, 400);
+            this.renderer.createTextStyle('default', 'Palatino Linotype', 45, true, true, '#55ffff', '#3366ff');
+            this.renderer.setDefaultInsertPosition(45, 485);
         };
         Timeline.prototype.createText = function (text) {
             return this.renderer.createText(text);
@@ -362,7 +385,9 @@ var djs;
             this.time += delta;
             this.renderer.render();
         };
-        Timeline.prototype.getTime = function () { return this.time; };
+        Timeline.prototype.getTime = function () {
+            return this.time;
+        };
         return Timeline;
     }());
     djs.Timeline = Timeline;

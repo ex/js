@@ -17,8 +17,8 @@ namespace djs {
             this.renderer = new djs.Renderer( this, htmlElement, window.innerWidth, window.innerHeight, true );
         }
 
-        public onResize( width: number, height: number ) {
-            this.renderer.onResize( width, height );
+        public onResize() {
+            this.renderer.onResize();
         }
 
         public onDataLoaded( data: any ) {
@@ -53,11 +53,11 @@ namespace djs {
             queue.loadManifest( manifest );
 
             // Load image
-            var loader = PIXI.loader;
+            var loader = PIXI.Loader.shared;
             loader.add( this.mediaPath + data.image );
             loader.load( onAssetsLoaded );
             function onAssetsLoaded() {
-                var texture = PIXI.Texture.fromImage( self.mediaPath + data.image, false, 1, 1 );
+                var texture = PIXI.Texture.from( self.mediaPath + data.image );
                 self.createImage( texture, 0, 0 );
                 self.imageLoaded = true;
             };
@@ -76,15 +76,15 @@ namespace djs {
 
             var self = this;
             this.mediaPath = mediaPath;
-            var loader = new PIXI.loaders.Loader();
+            var loader = PIXI.Loader.shared;
             loader.add( 'json', mediaPath + songFile );
 
             loader.load( function( _: any, res: any ) {
                 self.onDataLoaded( res.json.data );
             });
 
-            this.renderer.createTextStyle( 'default', 'Palatino Linotype', 50, true, true, '#55ffff', '#3366ff' );
-            this.renderer.setDefaultInsertPosition( 50, 400 );
+            this.renderer.createTextStyle( 'default', 'Palatino Linotype', 45, true, true, '#55ffff', '#3366ff' );
+            this.renderer.setDefaultInsertPosition( 45, 485 );
         }
 
         public createText( text: string ): number {
@@ -125,7 +125,9 @@ namespace djs {
             this.renderer.render();
         }
 
-        public getTime(): number { return this.time; }
+        public getTime(): number { 
+            return this.time;
+        }
 
         private time: number;
         private soundLoaded: boolean;
