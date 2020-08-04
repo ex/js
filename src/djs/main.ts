@@ -1,7 +1,7 @@
-﻿
-///<reference path="lib/soundjs/soundjs.d.ts"/>
+﻿///<reference path="lib/soundjs/soundjs.d.ts"/>
 
-var timeline = null;
+// For compilation in Windows use> tsc.cmd main.ts
+var timeline: djs.Timeline;
 
 window.onload = () => {
 

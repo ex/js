@@ -12,6 +12,7 @@ namespace djs {
             this.time = 0;
             this.soundLoaded = false;
             this.imageLoaded = false;
+            this.mediaPath = "";
 
             this.renderer = new djs.Renderer( this, htmlElement, window.innerWidth, window.innerHeight, true );
         }
@@ -44,10 +45,10 @@ namespace djs {
             createjs.Sound.alternateExtensions = ['mp3'];
             queue.installPlugin( createjs.Sound );
             queue.addEventListener( 'fileload', function( event ) {
-                self.onSoundLoaded( event );
+                self.onSoundLoaded();
             });
             queue.addEventListener( 'error', function( event ) {
-                self.onSoundError( event );
+                self.onSoundError();
             });
             queue.loadManifest( manifest );
 
@@ -62,11 +63,11 @@ namespace djs {
             };
         }
 
-        public onSoundLoaded( event ) {
+        public onSoundLoaded() {
             this.soundLoaded = true;
         }
 
-        public onSoundError( event ) {
+        public onSoundError() {
             this.soundLoaded = true; // play anyways
             console.warn( 'onSoundError' );
         }
@@ -78,7 +79,7 @@ namespace djs {
             var loader = new PIXI.loaders.Loader();
             loader.add( 'json', mediaPath + songFile );
 
-            loader.load( function( _, res ) {
+            loader.load( function( _: any, res: any ) {
                 self.onDataLoaded( res.json.data );
             });
 

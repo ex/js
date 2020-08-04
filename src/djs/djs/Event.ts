@@ -13,7 +13,7 @@ namespace djs {
 
         public onTime() { };
 
-        protected modifiers: Array<Modifier>;
+        //// protected modifiers: Array<Modifier>;
         protected timeline: djs.Timeline
     }
 

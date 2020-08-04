@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -11,6 +12,32 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+///<reference path="lib/soundjs/soundjs.d.ts"/>
+// For compilation in Windows use> tsc.cmd main.ts
+var timeline;
+window.onload = function () {
+    // Check that we can play audio
+    if (!createjs.Sound.initializeDefaultPlugins()) {
+        alert('Error initializing audio plugins');
+        return;
+    }
+    var timeline = new djs.Timeline('content');
+    timeline.load('media/natali/', 'hombre_mar.json');
+    var oldTime = Date.now();
+    var update = function () {
+        var newTime = Date.now();
+        var timeDelta = newTime - oldTime;
+        oldTime = newTime;
+        timeline.update(timeDelta);
+        window.requestAnimationFrame(update);
+    };
+    update();
+};
+window.onresize = function () {
+    if (timeline) {
+        timeline.onResize(window.innerWidth, window.innerHeight);
+    }
+};
 var djs;
 (function (djs) {
     var Event = /** @class */ (function () {
@@ -86,6 +113,7 @@ var djs;
 (function (djs) {
     var Modifier = /** @class */ (function () {
         function Modifier() {
+            this.duration = 0;
         }
         Modifier.prototype.onStart = function () {
         };
@@ -97,13 +125,16 @@ var djs;
 })(djs || (djs = {}));
 ///<reference path="../lib/pixi/pixi.js.d.ts"/>
 var djs;
+///<reference path="../lib/pixi/pixi.js.d.ts"/>
 (function (djs) {
     var Renderer = /** @class */ (function () {
         function Renderer(parent, htmlElement, width, height, debug) {
             this.parent = parent;
-            var el = document.getElementById(htmlElement);
             var app = new PIXI.Application(width, height, { backgroundColor: 0 });
-            el.appendChild(app.view);
+            var el = document.getElementById(htmlElement);
+            if (el) {
+                el.appendChild(app.view);
+            }
             this.stage = app.stage;
             this.renderer = app.renderer;
             this.graphics = new PIXI.Graphics();
@@ -134,7 +165,6 @@ var djs;
             }
         }
         Renderer.prototype.createTextStyle = function (name, font, size, italic, bold, colorA, colorB, borderColor, borderSize, shadow, shadowColor, shadowBlur, shadowAngle, shadowDistance, wordWrap, wordWrapWidth) {
-            if (colorB === void 0) { colorB = null; }
             if (borderColor === void 0) { borderColor = '#401010'; }
             if (borderSize === void 0) { borderSize = 5; }
             if (shadow === void 0) { shadow = true; }
@@ -171,7 +201,6 @@ var djs;
             this.defaultTextStyle = style;
         };
         Renderer.prototype.createText = function (text, position) {
-            if (position === void 0) { position = null; }
             var id = this.nodeCount++;
             var richText = new PIXI.Text(text, this.defaultTextStyle);
             richText.x = position ? position.x : this.defaultPosition.x;
@@ -181,7 +210,6 @@ var djs;
             return id;
         };
         Renderer.prototype.createImage = function (texture, position) {
-            if (position === void 0) { position = null; }
             var id = this.nodeCount++;
             var sprite = new PIXI.Sprite(texture);
             this.stage.addChild(sprite);
@@ -201,21 +229,23 @@ var djs;
         Renderer.prototype.deleteNode = function (idNode) {
             if (this.nodes[idNode]) {
                 this.stage.removeChild(this.nodes[idNode].node);
-                this.nodes[idNode] = null;
+                delete this.nodes[idNode];
             }
         };
         Renderer.prototype.setDebugText = function (text) {
-            this.debugText.text = text;
+            if (this.debugText) {
+                this.debugText.text = text;
+            }
         };
         Renderer.prototype.render = function () {
             this.renderer.render(this.stage);
             if (this.debugMode) {
-                this.setDebugText(this.parent.getTime());
+                this.setDebugText(this.parent.getTime().toString(10));
             }
         };
-        Renderer.prototype.onTouchDown = function (event) {
+        Renderer.prototype.onTouchDown = function () {
         };
-        Renderer.prototype.onTouchUp = function (event) {
+        Renderer.prototype.onTouchUp = function () {
         };
         Renderer.prototype.onResize = function (width, height) {
             if (this.renderer) {
@@ -229,6 +259,8 @@ var djs;
 ///<reference path="../lib/pixi/pixi.js.d.ts"/>
 ///<reference path="../lib/soundjs/soundjs.d.ts"/>
 var djs;
+///<reference path="../lib/pixi/pixi.js.d.ts"/>
+///<reference path="../lib/soundjs/soundjs.d.ts"/>
 (function (djs) {
     var Timeline = /** @class */ (function () {
         function Timeline(htmlElement) {
@@ -236,6 +268,7 @@ var djs;
             this.time = 0;
             this.soundLoaded = false;
             this.imageLoaded = false;
+            this.mediaPath = "";
             this.renderer = new djs.Renderer(this, htmlElement, window.innerWidth, window.innerHeight, true);
         }
         Timeline.prototype.onResize = function (width, height) {
@@ -264,10 +297,10 @@ var djs;
             createjs.Sound.alternateExtensions = ['mp3'];
             queue.installPlugin(createjs.Sound);
             queue.addEventListener('fileload', function (event) {
-                self.onSoundLoaded(event);
+                self.onSoundLoaded();
             });
             queue.addEventListener('error', function (event) {
-                self.onSoundError(event);
+                self.onSoundError();
             });
             queue.loadManifest(manifest);
             // Load image
@@ -281,10 +314,10 @@ var djs;
             }
             ;
         };
-        Timeline.prototype.onSoundLoaded = function (event) {
+        Timeline.prototype.onSoundLoaded = function () {
             this.soundLoaded = true;
         };
-        Timeline.prototype.onSoundError = function (event) {
+        Timeline.prototype.onSoundError = function () {
             this.soundLoaded = true; // play anyways
             console.warn('onSoundError');
         };
@@ -334,29 +367,4 @@ var djs;
     }());
     djs.Timeline = Timeline;
 })(djs || (djs = {}));
-///<reference path="lib/soundjs/soundjs.d.ts"/>
-var timeline = null;
-window.onload = function () {
-    // Check that we can play audio
-    if (!createjs.Sound.initializeDefaultPlugins()) {
-        alert('Error initializing audio plugins');
-        return;
-    }
-    var timeline = new djs.Timeline('content');
-    timeline.load('media/natali/', 'hombre_mar.json');
-    var oldTime = Date.now();
-    var update = function () {
-        var newTime = Date.now();
-        var timeDelta = newTime - oldTime;
-        oldTime = newTime;
-        timeline.update(timeDelta);
-        window.requestAnimationFrame(update);
-    };
-    update();
-};
-window.onresize = function () {
-    if (timeline) {
-        timeline.onResize(window.innerWidth, window.innerHeight);
-    }
-};
 //# sourceMappingURL=main.js.map

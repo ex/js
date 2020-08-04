@@ -12,10 +12,12 @@ namespace djs {
         constructor( parent: djs.Timeline, htmlElement: string, width: number, height: number, debug: boolean ) {
 
             this.parent = parent;
+            var app = new PIXI.Application( width, height, { backgroundColor: 0 });
 
             var el = document.getElementById(htmlElement);
-            var app = new PIXI.Application( width, height, { backgroundColor: 0 });
-            el.appendChild( app.view );
+            if ( el ) {
+                el.appendChild( app.view );
+            }
             this.stage = app.stage;
             this.renderer = app.renderer;
 
@@ -53,7 +55,7 @@ namespace djs {
 
         public createTextStyle( name: string, font: string, size: number,
                                 italic: boolean, bold: boolean,
-                                colorA: string, colorB: string = null,
+                                colorA: string, colorB?: string,
                                 borderColor: string = '#401010', borderSize: number = 5,
                                 shadow: boolean = true, shadowColor: string = '#000000',
                                 shadowBlur: number = 4, shadowAngle: number = 0.5236, shadowDistance: number = 6,
@@ -90,7 +92,7 @@ namespace djs {
             this.defaultTextStyle = style;
         }
 
-        public createText( text: string, position: PIXI.Point = null ): number {
+        public createText( text: string, position?: PIXI.Point ): number {
 
             var id = this.nodeCount++;
             var richText = new PIXI.Text( text, this.defaultTextStyle );
@@ -102,7 +104,7 @@ namespace djs {
             return id;
         }
 
-        public createImage( texture: PIXI.Texture, position: PIXI.Point = null ): number {
+        public createImage( texture: PIXI.Texture, position?: PIXI.Point ): number {
 
             var id = this.nodeCount++;
 
@@ -128,25 +130,27 @@ namespace djs {
         public deleteNode( idNode: number ) {
             if ( this.nodes[idNode] ) {
                 this.stage.removeChild( this.nodes[idNode].node );
-                this.nodes[idNode] = null;
+                delete this.nodes[idNode];
             }
         }
 
-        public setDebugText( text ) {
-            this.debugText.text = text;
+        public setDebugText( text: string ) {
+            if ( this.debugText ) {
+                this.debugText.text = text;
+            }
         }
 
         public render() {
             this.renderer.render( this.stage );
             if ( this.debugMode ) {
-                this.setDebugText( this.parent.getTime() );
+                this.setDebugText( this.parent.getTime().toString( 10 ) );
             }
         }
 
-        private onTouchDown( event ) {
+        private onTouchDown() {
         }
 
-        private onTouchUp( event ) {
+        private onTouchUp() {
         }
 
         public onResize( width: number, height: number ) {
@@ -160,13 +164,13 @@ namespace djs {
         private graphics: PIXI.Graphics;
 
         private textStyles: { [id: string]: PIXI.TextStyle };
-        private defaultTextStyle: PIXI.TextStyle;
+        private defaultTextStyle?: PIXI.TextStyle;
         private defaultPosition: PIXI.Point;
 
         private nodes: { [id: number]: RenderElement };
         private nodeCount: number;
 
-        private debugText: PIXI.Text;
+        private debugText?: PIXI.Text;
         private debugMode: boolean;
         private parent: djs.Timeline;
     }
