@@ -11,7 +11,7 @@ window.onload = () => {
         return;
     }
 
-    timeline = new djs.Timeline( 'content' );
+    timeline = new djs.Timeline();
     timeline.onResize();
     timeline.load( 'media/natali/', 'hombre_mar.json' );
 
@@ -29,6 +29,6 @@ window.onload = () => {
 };
 
 window.addEventListener( "resize", () => {
-    console.log("resize");
+    console.log( "resize: " + window.innerWidth + " " + window.innerHeight );
     timeline.onResize();
 } );    

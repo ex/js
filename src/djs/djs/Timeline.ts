@@ -6,15 +6,13 @@ namespace djs {
 
     export class Timeline {
 
-        constructor( htmlElement: string ) {
-
+        constructor() {
             this.events = new Array<djs.Event>();
             this.time = 0;
             this.soundLoaded = false;
             this.imageLoaded = false;
             this.mediaPath = "";
-
-            this.renderer = new djs.Renderer( this, htmlElement, window.innerWidth, window.innerHeight, true );
+            this.renderer = new djs.Renderer( this, window.innerWidth, window.innerHeight, false );
         }
 
         public onResize() {
@@ -54,7 +52,9 @@ namespace djs {
 
             // Load image
             var loader = PIXI.Loader.shared;
+
             loader.add( this.mediaPath + data.image );
+            loader.add( "media/filter.jpg" );
             loader.load( onAssetsLoaded );
             function onAssetsLoaded() {
                 var texture = PIXI.Texture.from( self.mediaPath + data.image );
@@ -73,7 +73,6 @@ namespace djs {
         }
 
         public load( mediaPath: string, songFile: string ) {
-
             var self = this;
             this.mediaPath = mediaPath;
             var loader = PIXI.Loader.shared;
@@ -112,7 +111,6 @@ namespace djs {
         }
 
         public update( delta: number ) {
-
             if ( !this.soundLoaded || !this.imageLoaded ) {
                 return;
             }

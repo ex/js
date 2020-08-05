@@ -9,16 +9,14 @@ namespace djs {
 
     export class Renderer {
 
-        constructor( parent: djs.Timeline, htmlElement: string, width: number, height: number, debug: boolean ) {
+        constructor( parent: djs.Timeline, width: number, height: number, debug: boolean ) {
 
             this.parent = parent;
             var app = new PIXI.Application( { width: width, height: height, backgroundColor: 0 } );
+            document.body.appendChild( app.view );
 
-            var el = document.getElementById(htmlElement);
-            if ( el ) {
-                el.appendChild( app.view );
-            }
             this.stage = app.stage;
+            this.stage.interactive = true;
             this.renderer = app.renderer;
 
             this.graphics = new PIXI.Graphics();
@@ -38,8 +36,7 @@ namespace djs {
             this.debugMode = debug;
             this.defaultPosition = new PIXI.Point();
 
-            if (this.debugMode )
-            {
+            if ( this.debugMode ) {
                 // Debug text
                 var style = new PIXI.TextStyle( {
                     fontFamily: 'Lucida Console',
@@ -93,7 +90,6 @@ namespace djs {
         }
 
         public createText( text: string, position?: PIXI.Point ): number {
-
             var id = this.nodeCount++;
             var richText = new PIXI.Text( text, this.defaultTextStyle );
             richText.x = position ? position.x : this.defaultPosition.x;
@@ -105,13 +101,28 @@ namespace djs {
         }
 
         public createImage( texture: PIXI.Texture, position?: PIXI.Point ): number {
-
             var id = this.nodeCount++;
 
-            var sprite = new PIXI.Sprite( texture );
-            this.stage.addChild( sprite )
+            // Container
+            var container = new PIXI.Container();
 
-            //this.nodes[id] = { node: sprite };
+            var sprite = new PIXI.Sprite( texture );
+            container.addChild( sprite );            
+
+            this.displacementSprite = PIXI.Sprite.from( 'media/filter.jpg' );
+            // Make sure the sprite is wrapping.
+            this.displacementSprite.texture.baseTexture.wrapMode = PIXI.WRAP_MODES.REPEAT;
+
+            const displacementFilter = new PIXI.filters.DisplacementFilter( this.displacementSprite );
+            displacementFilter.padding = 10;            
+            displacementFilter.scale.x = 60;
+            displacementFilter.scale.y = 60;
+
+            this.stage.addChild( this.displacementSprite );
+            this.stage.addChild( container );            
+            
+            // Apply it
+            sprite.filters = [displacementFilter];
             return id;
         }
 
@@ -141,7 +152,17 @@ namespace djs {
         }
 
         public render() {
+            if ( this.displacementSprite ) {
+                // Offset the sprite position to make vFilterCoord update to larger value. Repeat wrapping makes sure there's still pixels on the coordinates.
+                this.displacementSprite.x++;
+                // Reset x to 0 when it's over width to keep values from going to very huge numbers.
+                if ( this.displacementSprite.x > this.displacementSprite.width ) {
+                    this.displacementSprite.x = 0;
+                }
+            }
+
             this.renderer.render( this.stage );
+
             if ( this.debugMode ) {
                 this.setDebugText( this.parent.getTime().toString( 10 ) );
             }
@@ -186,6 +207,7 @@ namespace djs {
         private renderer: PIXI.Renderer;
         private stage: PIXI.Container;
         private graphics: PIXI.Graphics;
+        private displacementSprite?: PIXI.Sprite;
 
         private textStyles: { [id: string]: PIXI.TextStyle };
         private defaultTextStyle?: PIXI.TextStyle;

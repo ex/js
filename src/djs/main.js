@@ -21,7 +21,7 @@ window.onload = function () {
         alert('Error initializing audio plugins');
         return;
     }
-    timeline = new djs.Timeline('content');
+    timeline = new djs.Timeline();
     timeline.onResize();
     timeline.load('media/natali/', 'hombre_mar.json');
     var oldTime = Date.now();
@@ -35,7 +35,7 @@ window.onload = function () {
     update();
 };
 window.addEventListener("resize", function () {
-    console.log("resize");
+    console.log("resize: " + window.innerWidth + " " + window.innerHeight);
     timeline.onResize();
 });
 var djs;
@@ -128,16 +128,14 @@ var djs;
 ///<reference path="../lib/pixi/pixi.js.d.ts"/>
 (function (djs) {
     var Renderer = /** @class */ (function () {
-        function Renderer(parent, htmlElement, width, height, debug) {
+        function Renderer(parent, width, height, debug) {
             this.WIDTH = 960;
             this.HEIGHT = 600;
             this.parent = parent;
             var app = new PIXI.Application({ width: width, height: height, backgroundColor: 0 });
-            var el = document.getElementById(htmlElement);
-            if (el) {
-                el.appendChild(app.view);
-            }
+            document.body.appendChild(app.view);
             this.stage = app.stage;
+            this.stage.interactive = true;
             this.renderer = app.renderer;
             this.graphics = new PIXI.Graphics();
             this.graphics.width = width;
@@ -213,9 +211,21 @@ var djs;
         };
         Renderer.prototype.createImage = function (texture, position) {
             var id = this.nodeCount++;
+            // Container
+            var container = new PIXI.Container();
             var sprite = new PIXI.Sprite(texture);
-            this.stage.addChild(sprite);
-            //this.nodes[id] = { node: sprite };
+            container.addChild(sprite);
+            this.displacementSprite = PIXI.Sprite.from('media/filter.jpg');
+            // Make sure the sprite is wrapping.
+            this.displacementSprite.texture.baseTexture.wrapMode = PIXI.WRAP_MODES.REPEAT;
+            var displacementFilter = new PIXI.filters.DisplacementFilter(this.displacementSprite);
+            displacementFilter.padding = 10;
+            displacementFilter.scale.x = 60;
+            displacementFilter.scale.y = 60;
+            this.stage.addChild(this.displacementSprite);
+            this.stage.addChild(container);
+            // Apply it
+            sprite.filters = [displacementFilter];
             return id;
         };
         Renderer.prototype.setDefaultInsertPosition = function (x, y) {
@@ -240,6 +250,14 @@ var djs;
             }
         };
         Renderer.prototype.render = function () {
+            if (this.displacementSprite) {
+                // Offset the sprite position to make vFilterCoord update to larger value. Repeat wrapping makes sure there's still pixels on the coordinates.
+                this.displacementSprite.x++;
+                // Reset x to 0 when it's over width to keep values from going to very huge numbers.
+                if (this.displacementSprite.x > this.displacementSprite.width) {
+                    this.displacementSprite.x = 0;
+                }
+            }
             this.renderer.render(this.stage);
             if (this.debugMode) {
                 this.setDebugText(this.parent.getTime().toString(10));
@@ -286,13 +304,13 @@ var djs;
 ///<reference path="../lib/soundjs/soundjs.d.ts"/>
 (function (djs) {
     var Timeline = /** @class */ (function () {
-        function Timeline(htmlElement) {
+        function Timeline() {
             this.events = new Array();
             this.time = 0;
             this.soundLoaded = false;
             this.imageLoaded = false;
             this.mediaPath = "";
-            this.renderer = new djs.Renderer(this, htmlElement, window.innerWidth, window.innerHeight, true);
+            this.renderer = new djs.Renderer(this, window.innerWidth, window.innerHeight, false);
         }
         Timeline.prototype.onResize = function () {
             this.renderer.onResize();
@@ -329,6 +347,7 @@ var djs;
             // Load image
             var loader = PIXI.Loader.shared;
             loader.add(this.mediaPath + data.image);
+            loader.add("media/filter.jpg");
             loader.load(onAssetsLoaded);
             function onAssetsLoaded() {
                 var texture = PIXI.Texture.from(self.mediaPath + data.image);
