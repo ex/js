@@ -75,15 +75,17 @@ namespace djs {
         public load( mediaPath: string, songFile: string ) {
             var self = this;
             this.mediaPath = mediaPath;
-            var loader = PIXI.Loader.shared;
-            loader.add( 'json', mediaPath + songFile );
-
-            loader.load( function( _: any, res: any ) {
-                self.onDataLoaded( res.json.data );
-            });
 
             this.renderer.createTextStyle( 'default', 'Palatino Linotype', 45, true, true, '#55ffff', '#3366ff' );
-            this.renderer.setDefaultInsertPosition( 45, 485 );
+            this.renderer.setDefaultInsertPosition( 45, 490 );
+            const idNode = this.renderer.createText( "Loading..." );
+
+            var loader = PIXI.Loader.shared;
+            loader.add( 'json', mediaPath + songFile );
+            loader.load( function( _: any, res: any ) {
+                self.deleteNode( idNode );
+                self.onDataLoaded( res.json.data );
+            });
         }
 
         public createText( text: string ): number {
@@ -123,7 +125,7 @@ namespace djs {
             this.renderer.render();
         }
 
-        public getTime(): number { 
+        public getTime(): number {
             return this.time;
         }
 

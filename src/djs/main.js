@@ -366,13 +366,15 @@ var djs;
         Timeline.prototype.load = function (mediaPath, songFile) {
             var self = this;
             this.mediaPath = mediaPath;
+            this.renderer.createTextStyle('default', 'Palatino Linotype', 45, true, true, '#55ffff', '#3366ff');
+            this.renderer.setDefaultInsertPosition(45, 490);
+            var idNode = this.renderer.createText("Loading...");
             var loader = PIXI.Loader.shared;
             loader.add('json', mediaPath + songFile);
             loader.load(function (_, res) {
+                self.deleteNode(idNode);
                 self.onDataLoaded(res.json.data);
             });
-            this.renderer.createTextStyle('default', 'Palatino Linotype', 45, true, true, '#55ffff', '#3366ff');
-            this.renderer.setDefaultInsertPosition(45, 485);
         };
         Timeline.prototype.createText = function (text) {
             return this.renderer.createText(text);

@@ -57,7 +57,7 @@ namespace djs {
                                 shadow: boolean = true, shadowColor: string = '#000000',
                                 shadowBlur: number = 4, shadowAngle: number = 0.5236, shadowDistance: number = 6,
                                 wordWrap: boolean = false, wordWrapWidth: number = 440 ): boolean {
-            
+
             var fillColor = colorB ? [colorA, colorB] : colorA;
 
             var style = new PIXI.TextStyle( {
@@ -107,20 +107,20 @@ namespace djs {
             var container = new PIXI.Container();
 
             var sprite = new PIXI.Sprite( texture );
-            container.addChild( sprite );            
+            container.addChild( sprite );
 
             this.displacementSprite = PIXI.Sprite.from( 'media/filter.jpg' );
             // Make sure the sprite is wrapping.
             this.displacementSprite.texture.baseTexture.wrapMode = PIXI.WRAP_MODES.REPEAT;
 
             const displacementFilter = new PIXI.filters.DisplacementFilter( this.displacementSprite );
-            displacementFilter.padding = 10;            
+            displacementFilter.padding = 10;
             displacementFilter.scale.x = 60;
             displacementFilter.scale.y = 60;
 
             this.stage.addChild( this.displacementSprite );
-            this.stage.addChild( container );            
-            
+            this.stage.addChild( container );
+
             // Apply it
             sprite.filters = [displacementFilter];
             return id;
@@ -179,10 +179,10 @@ namespace djs {
             const vph = window.innerHeight; // Height of the viewport
             let nvw; // New game width
             let nvh; // New game height
-        
+
             // The aspect ratio is the ratio of the screen's sizes in different dimensions.
             // The height-to-width aspect ratio of the game is HEIGHT / WIDTH.
-        
+
             if ( vph / vpw < this.HEIGHT /this. WIDTH ) {
               // If height-to-width ratio of the viewport is less than the height-to-width ratio
               // of the game, then the height will be equal to the height of the viewport, and
@@ -194,7 +194,7 @@ namespace djs {
               nvw = vpw;
               nvh = ( nvw * this.HEIGHT ) / this.WIDTH;
             }
-        
+
             // Set the game screen size to the new values.
             // This command only makes the screen bigger --- it does not scale the contents of the game.
             // There will be a lot of extra room --- or missing room --- if we don't scale the stage.
