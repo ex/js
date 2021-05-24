@@ -54,7 +54,7 @@ var Renderer = /** @class */ (function () {
         this.speedTheta = 0;
         this.speedPhi = 0;
         this.speedGamma = 0;
-        this.renderer = PIXI.autoDetectRenderer(width, height, { antialias: true });
+        this.renderer = PIXI.autoDetectRenderer({ width: width, height: height, antialias: true });
         var el = document.getElementById(element);
         el.appendChild(this.renderer.view);
         // Create the root of the scene graph
