@@ -11145,8 +11145,9 @@ declare namespace PIXI {
          * @param {number} color - Color to add
          * @param {number} alpha - Alpha to use
          * @param {number} size - Number of colors to add
+         * @param {number} offset
          */
-        protected addColors(colors: number[], color: number, alpha: number, size: number): void;
+        protected addColors(colors: number[], color: number, alpha: number, size: number, offset: number): void;
         /**
          * Add texture id that the shader/fragment wants to use.
          *
@@ -11154,8 +11155,9 @@ declare namespace PIXI {
          * @param {number[]} textureIds
          * @param {number} id
          * @param {number} size
+         * @param {number} offset
          */
-        protected addTextureIds(textureIds: number[], id: number, size: number): void;
+        protected addTextureIds(textureIds: number[], id: number, size: number, offset: number): void;
         /**
          * Generates the UVs for a shape.
          *
