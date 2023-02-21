@@ -9,8 +9,8 @@
     if (navigator.geolocation) {
       const timeoutVal = 10 * 1000 * 1000; // set a timeout value for the query
       navigator.geolocation.getCurrentPosition(
-        // what to do if query succeeds
-        ((position) => alert("Latitude: " + position.coords.latitude + ", Longitude: " + position.coords.longitude)),
+        // Show Latitude , Longitude
+        ((position) => alert(position.coords.latitude + ", " + position.coords.longitude)),
         ((error) => {
           // what to do if query fails:
            const errors = {
