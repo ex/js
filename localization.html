@@ -5,7 +5,8 @@
 		<title>ex</title>
 	</head>
 	<script>
-    // check if geolocation is supported on this browser
+    // FOR Safari iOS check: https://austererisk.com/knowledge-base/field-apps/troubleshooting/error-user-denied-geolocation-on-ios-devices/
+    // check if geolocation is supported on this browser		
     if (navigator.geolocation) {
       const timeoutVal = 10 * 1000 * 1000; // set a timeout value for the query
       navigator.geolocation.getCurrentPosition(
