@@ -61,11 +61,11 @@ module Stc {
         public cells: number[][];
 
         // Position (x, y)
-        public x: number;
-        public y: number;
+        public x: number = 0;
+        public y: number = 0;
 
-        public size: number;
-        public type: number;
+        public size: number = 0;
+        public type: number = 0;
 
         constructor() {
             this.cells = [];
@@ -78,13 +78,13 @@ module Stc {
     // Datas structure for statistical data
     export class StcStatics {
         // User score for current game
-        public score: number;
+        public score: number = 0;
         // Total number of lines cleared
-        public lines: number;
-        // Total number of tetrominoes used                  
-        public totalPieces: number;
+        public lines: number = 0;
+        // Total number of tetrominoes used
+        public totalPieces: number = 0;
         // Current game level
-        public level: number;
+        public level: number = 0;
         // Number of tetrominoes per type
         public pieces: number[];
 
@@ -478,7 +478,7 @@ module Stc {
         }
 
         // Set matrix elements to indicated value
-        private setMatrixCells( matrix, width: number, height: number, value: number ) {
+        private setMatrixCells( matrix: number[][], width: number, height: number, value: number ) {
             for ( var i = 0; i < width; ++i ) {
                 for ( var j = 0; j < height; ++j ) {
                     matrix[i][j] = value;
@@ -593,7 +593,7 @@ module Stc {
         // tetromino is rotated this modifies the tetromino's cell buffer.
         private rotateTetromino( clockwise: boolean ) {
             var i: number, j: number;
-            var rotated = []; // temporary array to hold rotated cells
+            var rotated : number[][] = []; // temporary array to hold rotated cells
             for ( var k = 0; k < Game.TETROMINO_SIZE; ++k ) {
                 rotated[k] = [];
             }
@@ -849,34 +849,34 @@ module Stc {
 
         // Game events are stored in bits in this variable.
         // It must be cleared to EVENT_NONE after being used.
-        private m_events: number;
+        private m_events: number = 0;
 
         // Matrix that holds the cells (tilemap)
         private m_map: number[][];
 
-        private m_platform: Platform;         // platform interface
-        private m_stats: StcStatics;          // statistic data
+        private m_platform!: Platform;        // platform interface
+        private m_stats!: StcStatics;         // statistic data
         private m_fallingBlock: StcTetromino; // current falling tetromino
         private m_nextBlock: StcTetromino;    // next tetromino
 
-        private m_stateChanged: boolean; // true if game state has changed
-        private m_errorCode: number;  // stores current error code
-        private m_isPaused: boolean;     // true if the game is over
-        private m_isOver: boolean;       // true if the game is over
-        private m_showPreview: boolean;  // true if we must show the preview block
+        private m_stateChanged: boolean = false; // true if game state has changed
+        private m_errorCode: number = 0;         // stores current error code
+        private m_isPaused: boolean = false;     // true if the game is over
+        private m_isOver: boolean = false;       // true if the game is over
+        private m_showPreview: boolean = false;  // true if we must show the preview block
 
-        private m_showShadow: boolean;   // true if we must show the shadow block
-        private m_shadowGap: number;  // distance between falling block and shadow
+        private m_showShadow: boolean = false; // true if we must show the shadow block
+        private m_shadowGap: number = 0;       // distance between falling block and shadow
 
-        private m_systemTime: number;   // system time in milliseconds
-        private m_fallingDelay: number; // delay time for falling tetrominoes
-        private m_lastFallTime: number; // last time the falling tetromino dropped
+        private m_systemTime: number = 0;   // system time in milliseconds
+        private m_fallingDelay: number = 0; // delay time for falling tetrominoes
+        private m_lastFallTime: number = 0; // last time the falling tetromino dropped
 
         // For delayed autoshift:http://tetris.wikia.com/wiki/DAS
-        private m_delayLeft: number;
-        private m_delayRight: number;
-        private m_delayDown: number;
-        private m_delayRotation: number;
+        private m_delayLeft: number = 0;
+        private m_delayRight: number = 0;
+        private m_delayDown: number = 0;
+        private m_delayRotation: number = 0;
     }
 
     export class PlatformHTML5 implements Platform {
@@ -981,6 +981,8 @@ module Stc {
 
             // Draw background
             var context = canvasBack.getContext( '2d' );
+            if ( context == null ) return;
+
             context.drawImage( this.m_image, 0, PlatformHTML5.TEXTURE_SIZE - PlatformHTML5.SCREEN_HEIGHT,
                 PlatformHTML5.SCREEN_WIDTH, PlatformHTML5.SCREEN_HEIGHT, 0, 0,
                 PlatformHTML5.SCREEN_WIDTH, PlatformHTML5.SCREEN_HEIGHT );
@@ -1009,17 +1011,17 @@ module Stc {
 
             // Register events.
             var myself = this;
-            function handlerKeyDown( event ) {
+            function handlerKeyDown( event: any ) {
                 myself.onKeyDown( event );
             }
             window.addEventListener( 'keydown', handlerKeyDown, false );
 
-            function handlerKeyUp( event ) {
+            function handlerKeyUp( event: any ) {
                 myself.onKeyUp( event );
             }
             window.addEventListener( 'keyup', handlerKeyUp, false );
 
-            function handlerTouchDown( event ) {
+            function handlerTouchDown( event: any ) {
                 myself.onTouchStart( event );
             }
             if ( this.m_isIOS ) {
@@ -1029,7 +1031,7 @@ module Stc {
                 canvas.onmousedown = handlerTouchDown;
             }
 
-            function handlerTouchEnd( event ) {
+            function handlerTouchEnd( event: any ) {
                 myself.onTouchEnd( event );
             }
             if ( this.m_isIOS ) {
@@ -1052,7 +1054,7 @@ module Stc {
             this.m_canvas.fillText( text, ( PlatformHTML5.SCREEN_WIDTH - textWidth ) / 2, PlatformHTML5.SCREEN_HEIGHT / 2 );
         }
 
-        private onTouchStart( event ): void {
+        private onTouchStart( event: any ): void {
             var tx = event.layerX;
             var ty = event.layerY;
 
@@ -1102,14 +1104,14 @@ module Stc {
             console.info( "-- touchStart:" + tx + " " + ty );
         }
 
-        private onTouchEnd( event ): void {
+        private onTouchEnd( event: any ): void {
             this.m_game.onEventEnd( Game.EVENT_MOVE_LEFT );
             this.m_game.onEventEnd( Game.EVENT_MOVE_RIGHT );
             this.m_game.onEventEnd( Game.EVENT_MOVE_DOWN );
             this.m_game.onEventEnd( Game.EVENT_ROTATE_CW );
         }
 
-        private onKeyDown( event ): void {
+        private onKeyDown( event: any ): void {
             var key = ( event.which ) ? event.which : event.keyCode;
 
             switch ( key ) {
@@ -1135,7 +1137,7 @@ module Stc {
             }
         }
 
-        private onKeyUp( event ): void {
+        private onKeyUp( event: any ): void {
             var key = ( event.which ) ? event.which : event.keyCode;
 
             switch ( key ) {
@@ -1155,14 +1157,14 @@ module Stc {
         }
 
         // Initializes platform
-        public init( game ): number {
+        public init( game: Game ): number {
             this.m_game = game;
             return Game.ERROR_NONE;
         }
 
         // Clear resources used by platform
         public end(): void {
-            this.m_game = null;
+            // No really a way to free game resources in garbage collected languages
         }
 
         // Process events and notify game
@@ -1288,8 +1290,7 @@ module Stc {
             } while ( ++pos < length );
         }
 
-        private m_game: Game;
-        private m_timeStart: number;
+        private m_game!: Game;
         private m_canvasStats: any;
         private m_canvas: any;
         private m_image: HTMLImageElement;
