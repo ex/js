@@ -1,5 +1,8 @@
-var data = {
+// Import Observable runtime and the @d3/color-legend notebook
+import d3_colorLegend from 'https://api.observablehq.com/@d3/color-legend.js?v=3';
+import {Runtime} from 'https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js';
 
+var data = {
   'name': 'flare',
   'children': [
     {
@@ -355,8 +358,32 @@ var data = {
         {'name': 'Visualization', 'value': 16540}
       ]
     }
+  ],
+  'legend': [
+    'vis', 'util', 'animate', 'query', 'analytics', 'scale', 'data', 'physics',
+    'display', 'flex'
+
   ]
 };
+const color = d3.scaleOrdinal().domain(data.legend).range(d3.schemeCategory10)
+const margin = ({top: 20, right: 30, bottom: 30, left: 5})
+
+// Container element into which the swatches will render
+const container = document.querySelector('.container')
+
+renderSwatches(container)
+
+async function renderSwatches(el) {
+  // Get the value of the "swatches" notebook cell, which is the function we
+  // want, which returns a DOM element
+  const module = new Runtime().module(d3_colorLegend);
+  const swatches = await module.value('swatches');
+
+  // Finally, call `swatches` with our options and append it to the container
+  const element = swatches(
+      {color, marginLeft: margin.left, columns: '180px', width: '1000px'});
+  el.appendChild(element);
+}
 
 var gCount = 0;
 
