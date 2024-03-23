@@ -14,6 +14,7 @@ namespace djs {
 
         private events: Array<djs.Event>;
         private renderer: djs.Renderer;
+        private clickTextHandler: number = -1;        
 
         constructor() {
             this.events = new Array<djs.Event>();
@@ -22,6 +23,10 @@ namespace djs {
 
         public onResize() {
             this.renderer.onResize();
+        }
+
+        public onClick() {
+            this.initClick = true;
         }
 
         public onDataLoaded( data: any ) {
@@ -122,7 +127,15 @@ namespace djs {
                 return;
             }
             if ( !this.initClick ) {
+                if (this.clickTextHandler == -1) {
+                    this.clickTextHandler = this.renderer.createText( "Click to play..." );
+                }
                 return;
+            }
+            if (this.clickTextHandler != -1) {
+                this.deleteNode(this.clickTextHandler);
+                this.clickTextHandler = -1;
+                this.time = 0;
             }
             while ( this.events.length > 0 && ( this.time >= this.events[0].time ) ) {
                 this.events[0].onTime();
@@ -135,6 +148,5 @@ namespace djs {
         public getTime(): number {
             return this.time;
         }
-
     }
 }

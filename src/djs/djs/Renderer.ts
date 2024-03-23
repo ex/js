@@ -168,11 +168,9 @@ namespace djs {
             }
         }
 
-        private onTouchDown() {
-        }
+        private onTouchDown() { }
 
-        private onTouchUp() {
-        }
+        private onTouchUp() { }
 
         public onResize() {
             const vpw = window.innerWidth; // Width of the viewport

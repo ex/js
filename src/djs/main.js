@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -13,8 +14,124 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+///<reference path="lib/soundjs/soundjs.d.ts"/>
+// For compilation in Windows with tsconfig.json use> tsc.cmd
+var timeline;
+window.onload = function () {
+    // Check that we can play audio
+    if (!createjs.Sound.initializeDefaultPlugins()) {
+        alert('Error initializing audio plugins');
+        return;
+    }
+    timeline = new djs.Timeline();
+    timeline.onResize();
+    timeline.load('media/natali/', 'hombre_mar.json');
+    var oldTime = Date.now();
+    var update = function () {
+        var newTime = Date.now();
+        var timeDelta = newTime - oldTime;
+        oldTime = newTime;
+        timeline.update(timeDelta);
+        window.requestAnimationFrame(update);
+    };
+    update();
+};
+window.addEventListener("resize", function () {
+    console.log("resize: " + window.innerWidth + " " + window.innerHeight);
+    timeline.onResize();
+});
+window.addEventListener("click", function () {
+    console.log("click");
+    timeline.onClick();
+});
+var djs;
+(function (djs) {
+    var Event = /** @class */ (function () {
+        function Event(timeline, timeStart) {
+            this.time = timeStart;
+            this.timeline = timeline;
+        }
+        Event.prototype.onTime = function () { };
+        ;
+        return Event;
+    }());
+    djs.Event = Event;
+    var EventTextCreation = /** @class */ (function (_super) {
+        __extends(EventTextCreation, _super);
+        function EventTextCreation(timeline, timeStart, timeEnd, text) {
+            var _this = _super.call(this, timeline, timeStart) || this;
+            _this.text = text;
+            _this.timeEnd = timeEnd;
+            return _this;
+        }
+        EventTextCreation.prototype.onTime = function () {
+            var id = this.timeline.createText(this.text);
+            this.timeline.addEvent(new EventDeletion(this.timeline, this.timeEnd, id));
+        };
+        return EventTextCreation;
+    }(Event));
+    djs.EventTextCreation = EventTextCreation;
+    var EventImageCreation = /** @class */ (function (_super) {
+        __extends(EventImageCreation, _super);
+        function EventImageCreation(timeline, timeStart, timeEnd, imageTag, x, y) {
+            var _this = _super.call(this, timeline, timeStart) || this;
+            _this.image = imageTag;
+            _this.x = x;
+            _this.y = y;
+            _this.timeEnd = timeEnd;
+            return _this;
+        }
+        EventImageCreation.prototype.onTime = function () {
+            //var id = this.timeline.createImage( this.image, this.x, this.y );
+            //this.timeline.addEvent( new EventDeletion( this.timeline, this.timeEnd, id ) );
+        };
+        return EventImageCreation;
+    }(Event));
+    djs.EventImageCreation = EventImageCreation;
+    var EventPlayAudio = /** @class */ (function (_super) {
+        __extends(EventPlayAudio, _super);
+        function EventPlayAudio(timeline, timeStart, audioTag) {
+            var _this = _super.call(this, timeline, timeStart) || this;
+            _this.audio = audioTag;
+            return _this;
+        }
+        EventPlayAudio.prototype.onTime = function () {
+            this.timeline.playAudio(this.audio);
+        };
+        return EventPlayAudio;
+    }(Event));
+    djs.EventPlayAudio = EventPlayAudio;
+    var EventDeletion = /** @class */ (function (_super) {
+        __extends(EventDeletion, _super);
+        function EventDeletion(timeline, timeStart, idNode) {
+            var _this = _super.call(this, timeline, timeStart) || this;
+            _this.idNode = idNode;
+            return _this;
+        }
+        EventDeletion.prototype.onTime = function () {
+            this.timeline.deleteNode(this.idNode);
+        };
+        return EventDeletion;
+    }(Event));
+    djs.EventDeletion = EventDeletion;
+})(djs || (djs = {}));
+var djs;
+(function (djs) {
+    var Modifier = /** @class */ (function () {
+        function Modifier() {
+            this.duration = 0;
+        }
+        Modifier.prototype.onStart = function () {
+        };
+        Modifier.prototype.onEnd = function () {
+        };
+        return Modifier;
+    }());
+    djs.Modifier = Modifier;
+})(djs || (djs = {}));
 ///<reference path="../lib/pixi/pixi.js.d.ts"/>
 var djs;
+///<reference path="../lib/pixi/pixi.js.d.ts"/>
 (function (djs) {
     var Renderer = /** @class */ (function () {
         function Renderer(parent, width, height, debug) {
@@ -152,10 +269,8 @@ var djs;
                 this.setDebugText(this.parent.getTime().toString(10));
             }
         };
-        Renderer.prototype.onTouchDown = function () {
-        };
-        Renderer.prototype.onTouchUp = function () {
-        };
+        Renderer.prototype.onTouchDown = function () { };
+        Renderer.prototype.onTouchUp = function () { };
         Renderer.prototype.onResize = function () {
             var vpw = window.innerWidth; // Width of the viewport
             var vph = window.innerHeight; // Height of the viewport
@@ -186,132 +301,28 @@ var djs;
     }());
     djs.Renderer = Renderer;
 })(djs || (djs = {}));
-///<reference path="lib/soundjs/soundjs.d.ts"/>
-// For compilation in Windows with tsconfig.json use> tsc.cmd
-var timeline;
-window.onload = function () {
-    // Check that we can play audio
-    if (!createjs.Sound.initializeDefaultPlugins()) {
-        alert('Error initializing audio plugins');
-        return;
-    }
-    timeline = new djs.Timeline();
-    timeline.onResize();
-    timeline.load('media/natali/', 'hombre_mar.json');
-    var oldTime = Date.now();
-    var update = function () {
-        var newTime = Date.now();
-        var timeDelta = newTime - oldTime;
-        oldTime = newTime;
-        timeline.update(timeDelta);
-        window.requestAnimationFrame(update);
-    };
-    update();
-};
-window.addEventListener("resize", function () {
-    console.log("resize: " + window.innerWidth + " " + window.innerHeight);
-    timeline.onResize();
-});
-var djs;
-(function (djs) {
-    var Event = /** @class */ (function () {
-        function Event(timeline, timeStart) {
-            this.time = timeStart;
-            this.timeline = timeline;
-        }
-        Event.prototype.onTime = function () { };
-        ;
-        return Event;
-    }());
-    djs.Event = Event;
-    var EventTextCreation = /** @class */ (function (_super) {
-        __extends(EventTextCreation, _super);
-        function EventTextCreation(timeline, timeStart, timeEnd, text) {
-            var _this = _super.call(this, timeline, timeStart) || this;
-            _this.text = text;
-            _this.timeEnd = timeEnd;
-            return _this;
-        }
-        EventTextCreation.prototype.onTime = function () {
-            var id = this.timeline.createText(this.text);
-            this.timeline.addEvent(new EventDeletion(this.timeline, this.timeEnd, id));
-        };
-        return EventTextCreation;
-    }(Event));
-    djs.EventTextCreation = EventTextCreation;
-    var EventImageCreation = /** @class */ (function (_super) {
-        __extends(EventImageCreation, _super);
-        function EventImageCreation(timeline, timeStart, timeEnd, imageTag, x, y) {
-            var _this = _super.call(this, timeline, timeStart) || this;
-            _this.image = imageTag;
-            _this.x = x;
-            _this.y = y;
-            _this.timeEnd = timeEnd;
-            return _this;
-        }
-        EventImageCreation.prototype.onTime = function () {
-            //var id = this.timeline.createImage( this.image, this.x, this.y );
-            //this.timeline.addEvent( new EventDeletion( this.timeline, this.timeEnd, id ) );
-        };
-        return EventImageCreation;
-    }(Event));
-    djs.EventImageCreation = EventImageCreation;
-    var EventPlayAudio = /** @class */ (function (_super) {
-        __extends(EventPlayAudio, _super);
-        function EventPlayAudio(timeline, timeStart, audioTag) {
-            var _this = _super.call(this, timeline, timeStart) || this;
-            _this.audio = audioTag;
-            return _this;
-        }
-        EventPlayAudio.prototype.onTime = function () {
-            this.timeline.playAudio(this.audio);
-        };
-        return EventPlayAudio;
-    }(Event));
-    djs.EventPlayAudio = EventPlayAudio;
-    var EventDeletion = /** @class */ (function (_super) {
-        __extends(EventDeletion, _super);
-        function EventDeletion(timeline, timeStart, idNode) {
-            var _this = _super.call(this, timeline, timeStart) || this;
-            _this.idNode = idNode;
-            return _this;
-        }
-        EventDeletion.prototype.onTime = function () {
-            this.timeline.deleteNode(this.idNode);
-        };
-        return EventDeletion;
-    }(Event));
-    djs.EventDeletion = EventDeletion;
-})(djs || (djs = {}));
-var djs;
-(function (djs) {
-    var Modifier = /** @class */ (function () {
-        function Modifier() {
-            this.duration = 0;
-        }
-        Modifier.prototype.onStart = function () {
-        };
-        Modifier.prototype.onEnd = function () {
-        };
-        return Modifier;
-    }());
-    djs.Modifier = Modifier;
-})(djs || (djs = {}));
 ///<reference path="../lib/pixi/pixi.js.d.ts"/>
 ///<reference path="../lib/soundjs/soundjs.d.ts"/>
 var djs;
+///<reference path="../lib/pixi/pixi.js.d.ts"/>
+///<reference path="../lib/soundjs/soundjs.d.ts"/>
 (function (djs) {
     var Timeline = /** @class */ (function () {
         function Timeline() {
-            this.events = new Array();
             this.time = 0;
             this.soundLoaded = false;
             this.imageLoaded = false;
+            this.initClick = false;
             this.mediaPath = "";
+            this.clickTextHandler = -1;
+            this.events = new Array();
             this.renderer = new djs.Renderer(this, window.innerWidth, window.innerHeight, false);
         }
         Timeline.prototype.onResize = function () {
             this.renderer.onResize();
+        };
+        Timeline.prototype.onClick = function () {
+            this.initClick = true;
         };
         Timeline.prototype.onDataLoaded = function (data) {
             // Load events
@@ -396,6 +407,17 @@ var djs;
         Timeline.prototype.update = function (delta) {
             if (!this.soundLoaded || !this.imageLoaded) {
                 return;
+            }
+            if (!this.initClick) {
+                if (this.clickTextHandler == -1) {
+                    this.clickTextHandler = this.renderer.createText("Click to play...");
+                }
+                return;
+            }
+            if (this.clickTextHandler != -1) {
+                this.deleteNode(this.clickTextHandler);
+                this.clickTextHandler = -1;
+                this.time = 0;
             }
             while (this.events.length > 0 && (this.time >= this.events[0].time)) {
                 this.events[0].onTime();
