@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>ex</title>
+	</head>
+	<script>
+    // FOR Safari iOS check: https://austererisk.com/knowledge-base/field-apps/troubleshooting/error-user-denied-geolocation-on-ios-devices/
+    // check if geolocation is supported on this browser		
+    if (navigator.geolocation) {
+      const timeoutVal = 10 * 1000 * 1000; // set a timeout value for the query
+      navigator.geolocation.getCurrentPosition(
+        // Show Latitude , Longitude
+        ((position) => alert(position.coords.latitude + ", " + position.coords.longitude)),
+        ((error) => {
+          // what to do if query fails:
+           const errors = {
+             1: 'Permission denied',
+             2: 'Position unavailable',
+             3: 'Request timeout'
+           };
+
+           alert("Error: " + errors[error.code]); // print the error
+        }),
+        // these 3 parameters are very important, especially the first one
+        { enableHighAccuracy: true, timeout: timeoutVal, maximumAge: 0 }
+      );
+    }
+    else {
+      alert("Geolocation is not supported by this browser");
+    }
+	</script>
+	<body>
+	</body>
+</html>
