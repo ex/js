@@ -67,7 +67,8 @@ class Renderer {
 
         this.renderer = PIXI.autoDetectRenderer( { width: width, height: height, antialias: true } );
         var el = document.getElementById( element );
-        el.appendChild( this.renderer.view );
+        if (el)
+            el.appendChild( this.renderer.view );
 
         // Create the root of the scene graph
         this.stage = new PIXI.Container();
@@ -106,7 +107,7 @@ class Renderer {
         this.renderer.render( this.stage );
     }
 
-    private onTouchDown( event ) {
+    private onTouchDown( event: any ) {
         var dx = event.data.global.x - this.centerX;
         if ( ( dx > this.RADIUS ) || ( dx < -this.RADIUS ) ) {
             this.speedTheta = 0.1 * dx / this.size;
@@ -122,7 +123,7 @@ class Renderer {
         }
     }
 
-    private onTouchUp( event ) {
+    private onTouchUp( event: any ) {
         this.speedTheta = 0;
         this.speedPhi = 0;
         this.speedGamma = 0;
@@ -196,13 +197,13 @@ class Renderer {
     private stage: PIXI.Container;
     private graphics: PIXI.Graphics;
 
-    private size: number;
-    private offsetX: number;
-    private offsetY: number;
-    private centerX: number;
-    private centerY: number;
+    private size: number = 0;
+    private offsetX: number = 0;
+    private offsetY: number = 0;
+    private centerX: number = 0;
+    private centerY: number = 0;
 
-    private scale: number;
+    private scale: number = 0;
 
     private theta: number;
     private phi: number;

@@ -1,3 +1,4 @@
+"use strict";
 ///<reference path="lib/pixi/pixi.js.d.ts"/>
 var STARS = [
     { id: 0, x: 1.631e-005, y: 0, z: 0 },
@@ -45,6 +46,12 @@ var Vector = /** @class */ (function () {
 }());
 var Renderer = /** @class */ (function () {
     function Renderer(element, width, height) {
+        this.size = 0;
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.centerX = 0;
+        this.centerY = 0;
+        this.scale = 0;
         this.RADIUS = 100;
         Renderer.instance = this;
         this.onResize(width, height);
@@ -56,7 +63,8 @@ var Renderer = /** @class */ (function () {
         this.speedGamma = 0;
         this.renderer = PIXI.autoDetectRenderer({ width: width, height: height, antialias: true });
         var el = document.getElementById(element);
-        el.appendChild(this.renderer.view);
+        if (el)
+            el.appendChild(this.renderer.view);
         // Create the root of the scene graph
         this.stage = new PIXI.Container();
         this.graphics = new PIXI.Graphics();
