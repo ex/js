@@ -6,12 +6,17 @@ namespace djs {
 
     export class Timeline {
 
+        private time: number = 0;
+        private soundLoaded: boolean = false;
+        private imageLoaded: boolean = false;
+        private initClick: boolean = false;
+        private mediaPath: string = "";
+
+        private events: Array<djs.Event>;
+        private renderer: djs.Renderer;
+
         constructor() {
             this.events = new Array<djs.Event>();
-            this.time = 0;
-            this.soundLoaded = false;
-            this.imageLoaded = false;
-            this.mediaPath = "";
             this.renderer = new djs.Renderer( this, window.innerWidth, window.innerHeight, false );
         }
 
@@ -116,7 +121,9 @@ namespace djs {
             if ( !this.soundLoaded || !this.imageLoaded ) {
                 return;
             }
-
+            if ( !this.initClick ) {
+                return;
+            }
             while ( this.events.length > 0 && ( this.time >= this.events[0].time ) ) {
                 this.events[0].onTime();
                 this.events.shift();
@@ -129,11 +136,5 @@ namespace djs {
             return this.time;
         }
 
-        private time: number;
-        private soundLoaded: boolean;
-        private imageLoaded: boolean;
-        private events: Array<djs.Event>;
-        private renderer: djs.Renderer;
-        private mediaPath: string;
     }
 }
