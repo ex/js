@@ -37,7 +37,7 @@ window.onload = function () {
     update();
 };
 window.addEventListener("resize", function () {
-    console.log("resize: " + window.innerWidth + " " + window.innerHeight);
+    // console.log( "resize: " + window.innerWidth + " " + window.innerHeight );
     timeline.onResize();
 });
 var djs;
@@ -217,9 +217,9 @@ var djs;
             // Make sure the sprite is wrapping.
             this.displacementSprite.texture.baseTexture.wrapMode = PIXI.WRAP_MODES.REPEAT;
             var displacementFilter = new PIXI.filters.DisplacementFilter(this.displacementSprite);
-            displacementFilter.padding = 10;
-            displacementFilter.scale.x = 60;
-            displacementFilter.scale.y = 60;
+            displacementFilter.padding = 5;
+            displacementFilter.scale.x = 30;
+            displacementFilter.scale.y = 30;
             this.stage.addChild(this.displacementSprite);
             this.stage.addChild(container);
             // Apply it
@@ -281,16 +281,20 @@ var djs;
                 // the width will be scaled.
                 nvh = vph;
                 nvw = (nvh * this.WIDTH) / this.HEIGHT;
+                this.stage.position.x = (vpw - nvw) / 2;
+                this.stage.position.y = 0;
             }
             else {
                 // In the else case, the opposite is happening.
                 nvw = vpw;
                 nvh = (nvw * this.HEIGHT) / this.WIDTH;
+                this.stage.position.x = 0;
+                this.stage.position.y = (vph - nvh) / 2;
             }
             // Set the game screen size to the new values.
             // This command only makes the screen bigger --- it does not scale the contents of the game.
             // There will be a lot of extra room --- or missing room --- if we don't scale the stage.
-            this.renderer.resize(nvw, nvh);
+            this.renderer.resize(vpw, vph);
             // This command scales the stage to fit the new size of the game.
             this.stage.scale.set(nvw / this.WIDTH, nvh / this.HEIGHT);
         };
@@ -317,6 +321,7 @@ var djs;
         }
         Timeline.prototype.onResize = function () {
             this.renderer.onResize();
+            this.renderer.render();
         };
         Timeline.prototype.onClick = function () {
             this.initClick = true;

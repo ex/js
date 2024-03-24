@@ -14,7 +14,7 @@ namespace djs {
 
         private events: Array<djs.Event>;
         private renderer: djs.Renderer;
-        private clickTextHandler: number = -1;        
+        private clickTextHandler: number = -1;
 
         constructor() {
             this.events = new Array<djs.Event>();
@@ -23,6 +23,7 @@ namespace djs {
 
         public onResize() {
             this.renderer.onResize();
+            this.renderer.render();
         }
 
         public onClick() {
@@ -123,7 +124,6 @@ namespace djs {
         }
 
         public update( delta: number ) {
-
             if ( !this.soundLoaded || !this.imageLoaded ) {
                 return;
             }

@@ -29,6 +29,6 @@ window.onload = () => {
 };
 
 window.addEventListener( "resize", () => {
-    console.log( "resize: " + window.innerWidth + " " + window.innerHeight );
+    // console.log( "resize: " + window.innerWidth + " " + window.innerHeight );
     timeline.onResize();
 } );
