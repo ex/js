@@ -12,23 +12,19 @@ namespace djs {
         constructor( parent: djs.Timeline, width: number, height: number, debug: boolean ) {
 
             this.parent = parent;
-            var app = new PIXI.Application( { width: width, height: height, backgroundColor: 0 } );
-            document.body.appendChild( app.view );
 
-            this.stage = app.stage;
+            this.renderer = PIXI.autoDetectRenderer( { width: width, height: height, antialias: true } );
+            document.body.appendChild( this.renderer.view );
+    
+            // Create the root of the scene graph
+            this.stage = new PIXI.Container();
+
             this.stage.interactive = true;
-            this.renderer = app.renderer;
-
-            this.graphics = new PIXI.Graphics();
-            this.graphics.width = width;
-            this.graphics.height = height;
-            this.graphics.interactive = true;
-            this.graphics.on( 'mousedown', this.onTouchDown, this );
-            this.graphics.on( 'touchdown', this.onTouchDown, this );
-            this.graphics.on( 'mouseup', this.onTouchUp, this );
-            this.graphics.on( 'touchup', this.onTouchUp, this );
-
-            this.stage.addChild( this.graphics );
+            this.stage.on( 'pointertap', this.onTouchDown, this );            
+            this.stage.on( 'mousedown', this.onTouchDown, this );
+            this.stage.on( 'touchdown', this.onTouchDown, this );
+            this.stage.on( 'mouseup', this.onTouchUp, this );
+            this.stage.on( 'touchup', this.onTouchUp, this );
 
             this.textStyles = {};
             this.nodes = {};
@@ -168,9 +164,14 @@ namespace djs {
             }
         }
 
-        private onTouchDown() { }
+        private onTouchDown( event: any ) {
+            console.debug("onTouchDown");
+            this.parent.onClick();
+         }
 
-        private onTouchUp() { }
+         private onTouchUp( event: any ) {
+            console.debug("onTouchUp");
+         }
 
         public onResize() {
             const vpw = window.innerWidth; // Width of the viewport
@@ -204,7 +205,6 @@ namespace djs {
 
         private renderer: PIXI.Renderer;
         private stage: PIXI.Container;
-        private graphics: PIXI.Graphics;
         private displacementSprite?: PIXI.Sprite;
 
         private textStyles: { [id: string]: PIXI.TextStyle };

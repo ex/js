@@ -40,10 +40,6 @@ window.addEventListener("resize", function () {
     console.log("resize: " + window.innerWidth + " " + window.innerHeight);
     timeline.onResize();
 });
-window.addEventListener("click", function () {
-    console.log("click");
-    timeline.onClick();
-});
 var djs;
 (function (djs) {
     var Event = /** @class */ (function () {
@@ -138,20 +134,16 @@ var djs;
             this.WIDTH = 960;
             this.HEIGHT = 600;
             this.parent = parent;
-            var app = new PIXI.Application({ width: width, height: height, backgroundColor: 0 });
-            document.body.appendChild(app.view);
-            this.stage = app.stage;
+            this.renderer = PIXI.autoDetectRenderer({ width: width, height: height, antialias: true });
+            document.body.appendChild(this.renderer.view);
+            // Create the root of the scene graph
+            this.stage = new PIXI.Container();
             this.stage.interactive = true;
-            this.renderer = app.renderer;
-            this.graphics = new PIXI.Graphics();
-            this.graphics.width = width;
-            this.graphics.height = height;
-            this.graphics.interactive = true;
-            this.graphics.on('mousedown', this.onTouchDown, this);
-            this.graphics.on('touchdown', this.onTouchDown, this);
-            this.graphics.on('mouseup', this.onTouchUp, this);
-            this.graphics.on('touchup', this.onTouchUp, this);
-            this.stage.addChild(this.graphics);
+            this.stage.on('pointertap', this.onTouchDown, this);
+            this.stage.on('mousedown', this.onTouchDown, this);
+            this.stage.on('touchdown', this.onTouchDown, this);
+            this.stage.on('mouseup', this.onTouchUp, this);
+            this.stage.on('touchup', this.onTouchUp, this);
             this.textStyles = {};
             this.nodes = {};
             this.nodeCount = 0;
@@ -269,8 +261,13 @@ var djs;
                 this.setDebugText(this.parent.getTime().toString(10));
             }
         };
-        Renderer.prototype.onTouchDown = function () { };
-        Renderer.prototype.onTouchUp = function () { };
+        Renderer.prototype.onTouchDown = function (event) {
+            console.debug("onTouchDown");
+            this.parent.onClick();
+        };
+        Renderer.prototype.onTouchUp = function (event) {
+            console.debug("onTouchUp");
+        };
         Renderer.prototype.onResize = function () {
             var vpw = window.innerWidth; // Width of the viewport
             var vph = window.innerHeight; // Height of the viewport
@@ -411,6 +408,7 @@ var djs;
             if (!this.initClick) {
                 if (this.clickTextHandler == -1) {
                     this.clickTextHandler = this.renderer.createText("Click to play...");
+                    this.renderer.render();
                 }
                 return;
             }

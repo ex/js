@@ -123,12 +123,14 @@ namespace djs {
         }
 
         public update( delta: number ) {
+
             if ( !this.soundLoaded || !this.imageLoaded ) {
                 return;
             }
             if ( !this.initClick ) {
                 if (this.clickTextHandler == -1) {
                     this.clickTextHandler = this.renderer.createText( "Click to play..." );
+                    this.renderer.render();
                 }
                 return;
             }
