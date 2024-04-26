@@ -4,7 +4,7 @@
 /* -------------------------------------------------------------------------- */
 /*   A simple tetris clone.                                                   */
 /*                                                                            */
-/*   Copyright (c) 2015 Laurens Rodriguez Oscanoa.                            */
+/*   Copyright (c) Laurens Rodriguez                                          */
 /*                                                                            */
 /*   Permission is hereby granted, free of charge, to any person              */
 /*   obtaining a copy of this software and associated documentation           */
@@ -27,35 +27,25 @@
 /*   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR            */
 /*   OTHER DEALINGS IN THE SOFTWARE.                                          */
 /* -------------------------------------------------------------------------- */
+window.onload = function () {
+    // [iPhone] hiding Safari user interface components
+    // http://stackoverflow.com/questions/273671/hiding-safari-user-interface-components-on-iphone
+    setTimeout(function () { window.scrollTo(0, 1); }, 0);
+    // Start loading the image with all game elements.
+    var image = new Image();
+    image.src = "stc_sprites.png";
+    // Start game after image has loaded.
+    image.onload = function () {
+        var platform = new Stc.PlatformHTML5(image);
+        var game = new Stc.Game();
+        game.init(platform);
+        function update() {
+            game.update();
+        }
+        setInterval(update, 1000 / Stc.PlatformHTML5.FPS);
+    };
+};
 var Stc;
-/* ========================================================================== */
-/*                          STC - SIMPLE TETRIS CLONE                         */
-/* -------------------------------------------------------------------------- */
-/*   A simple tetris clone.                                                   */
-/*                                                                            */
-/*   Copyright (c) 2015 Laurens Rodriguez Oscanoa.                            */
-/*                                                                            */
-/*   Permission is hereby granted, free of charge, to any person              */
-/*   obtaining a copy of this software and associated documentation           */
-/*   files (the "Software"), to deal in the Software without                  */
-/*   restriction, including without limitation the rights to use,             */
-/*   copy, modify, merge, publish, distribute, sublicense, and/or sell        */
-/*   copies of the Software, and to permit persons to whom the                */
-/*   Software is furnished to do so, subject to the following                 */
-/*   conditions:                                                              */
-/*                                                                            */
-/*   The above copyright notice and this permission notice shall be           */
-/*   included in all copies or substantial portions of the Software.          */
-/*                                                                            */
-/*   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,          */
-/*   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES          */
-/*   OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND                 */
-/*   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT              */
-/*   HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,             */
-/*   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING             */
-/*   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR            */
-/*   OTHER DEALINGS IN THE SOFTWARE.                                          */
-/* -------------------------------------------------------------------------- */
 (function (Stc) {
     // Data structure that holds information about our tetromino blocks.
     var StcTetromino = /** @class */ (function () {
@@ -768,6 +758,9 @@ var Stc;
         return Game;
     }());
     Stc.Game = Game;
+})(Stc || (Stc = {}));
+var Stc;
+(function (Stc) {
     var PlatformHTML5 = /** @class */ (function () {
         function PlatformHTML5(image) {
             // http://stackoverflow.com/questions/9038625/detect-if-device-is-ios
@@ -851,24 +844,24 @@ var Stc;
             var ty = event.layerY;
             if (tx < PlatformHTML5.TX_1) {
                 if (ty < PlatformHTML5.TY_1) {
-                    this.m_game.onEventStart(Game.EVENT_RESTART);
+                    this.m_game.onEventStart(Stc.Game.EVENT_RESTART);
                 }
                 else if (ty < PlatformHTML5.TY_2) {
-                    this.m_game.onEventStart(Game.EVENT_MOVE_LEFT);
+                    this.m_game.onEventStart(Stc.Game.EVENT_MOVE_LEFT);
                 }
                 else {
-                    this.m_game.onEventStart(Game.EVENT_SHOW_NEXT);
+                    this.m_game.onEventStart(Stc.Game.EVENT_SHOW_NEXT);
                 }
             }
             else if (tx < PlatformHTML5.TX_2) {
                 if (ty > PlatformHTML5.TY_DROP) {
-                    this.m_game.onEventStart(Game.EVENT_DROP);
+                    this.m_game.onEventStart(Stc.Game.EVENT_DROP);
                 }
                 else if (ty > PlatformHTML5.TY_DOWN) {
-                    this.m_game.onEventStart(Game.EVENT_MOVE_DOWN);
+                    this.m_game.onEventStart(Stc.Game.EVENT_MOVE_DOWN);
                 }
                 else {
-                    this.m_game.onEventStart(Game.EVENT_ROTATE_CW);
+                    this.m_game.onEventStart(Stc.Game.EVENT_ROTATE_CW);
                 }
             }
             else {
@@ -882,45 +875,46 @@ var Stc;
                             this.m_game.setChanged(true);
                             this.renderGame();
                         }
-                        this.m_game.onEventStart(Game.EVENT_PAUSE);
+                        this.m_game.onEventStart(Stc.Game.EVENT_PAUSE);
                     }
                 }
                 else if (ty < PlatformHTML5.TY_2) {
-                    this.m_game.onEventStart(Game.EVENT_MOVE_RIGHT);
+                    this.m_game.onEventStart(Stc.Game.EVENT_MOVE_RIGHT);
                 }
                 else {
-                    this.m_game.onEventStart(Game.EVENT_SHOW_SHADOW);
+                    this.m_game.onEventStart(Stc.Game.EVENT_SHOW_SHADOW);
                 }
             }
             console.info("-- touchStart:" + tx + " " + ty);
         };
+        // @ts-ignore
         PlatformHTML5.prototype.onTouchEnd = function (event) {
-            this.m_game.onEventEnd(Game.EVENT_MOVE_LEFT);
-            this.m_game.onEventEnd(Game.EVENT_MOVE_RIGHT);
-            this.m_game.onEventEnd(Game.EVENT_MOVE_DOWN);
-            this.m_game.onEventEnd(Game.EVENT_ROTATE_CW);
+            this.m_game.onEventEnd(Stc.Game.EVENT_MOVE_LEFT);
+            this.m_game.onEventEnd(Stc.Game.EVENT_MOVE_RIGHT);
+            this.m_game.onEventEnd(Stc.Game.EVENT_MOVE_DOWN);
+            this.m_game.onEventEnd(Stc.Game.EVENT_ROTATE_CW);
         };
         PlatformHTML5.prototype.onKeyDown = function (event) {
             var key = (event.which) ? event.which : event.keyCode;
             switch (key) {
                 case PlatformHTML5.KEY_A:
                 case PlatformHTML5.KEY_LEFT:
-                    this.m_game.onEventStart(Game.EVENT_MOVE_LEFT);
+                    this.m_game.onEventStart(Stc.Game.EVENT_MOVE_LEFT);
                     break;
                 case PlatformHTML5.KEY_D:
                 case PlatformHTML5.KEY_RIGHT:
-                    this.m_game.onEventStart(Game.EVENT_MOVE_RIGHT);
+                    this.m_game.onEventStart(Stc.Game.EVENT_MOVE_RIGHT);
                     break;
                 case PlatformHTML5.KEY_W:
                 case PlatformHTML5.KEY_UP:
-                    this.m_game.onEventStart(Game.EVENT_ROTATE_CW);
+                    this.m_game.onEventStart(Stc.Game.EVENT_ROTATE_CW);
                     break;
                 case PlatformHTML5.KEY_S:
                 case PlatformHTML5.KEY_DOWN:
-                    this.m_game.onEventStart(Game.EVENT_MOVE_DOWN);
+                    this.m_game.onEventStart(Stc.Game.EVENT_MOVE_DOWN);
                     break;
                 case PlatformHTML5.KEY_SPACE:
-                    this.m_game.onEventStart(Game.EVENT_DROP);
+                    this.m_game.onEventStart(Stc.Game.EVENT_DROP);
                     break;
             }
         };
@@ -928,23 +922,23 @@ var Stc;
             var key = (event.which) ? event.which : event.keyCode;
             switch (key) {
                 case PlatformHTML5.KEY_LEFT:
-                    this.m_game.onEventEnd(Game.EVENT_MOVE_LEFT);
+                    this.m_game.onEventEnd(Stc.Game.EVENT_MOVE_LEFT);
                     break;
                 case PlatformHTML5.KEY_RIGHT:
-                    this.m_game.onEventEnd(Game.EVENT_MOVE_RIGHT);
+                    this.m_game.onEventEnd(Stc.Game.EVENT_MOVE_RIGHT);
                     break;
                 case PlatformHTML5.KEY_UP:
-                    this.m_game.onEventEnd(Game.EVENT_ROTATE_CW);
+                    this.m_game.onEventEnd(Stc.Game.EVENT_ROTATE_CW);
                     break;
                 case PlatformHTML5.KEY_DOWN:
-                    this.m_game.onEventEnd(Game.EVENT_MOVE_DOWN);
+                    this.m_game.onEventEnd(Stc.Game.EVENT_MOVE_DOWN);
                     break;
             }
         };
         // Initializes platform
         PlatformHTML5.prototype.init = function (game) {
             this.m_game = game;
-            return Game.ERROR_NONE;
+            return Stc.Game.ERROR_NONE;
         };
         // Clear resources used by platform
         PlatformHTML5.prototype.end = function () {
@@ -963,9 +957,9 @@ var Stc;
                 this.m_canvas.clearRect(0, 0, PlatformHTML5.SCREEN_WIDTH, PlatformHTML5.SCREEN_HEIGHT);
                 // Draw preview block
                 if (this.m_game.showPreview()) {
-                    for (i = 0; i < Game.TETROMINO_SIZE; ++i) {
-                        for (j = 0; j < Game.TETROMINO_SIZE; ++j) {
-                            if (this.m_game.nextBlock().cells[i][j] != Game.EMPTY_CELL) {
+                    for (i = 0; i < Stc.Game.TETROMINO_SIZE; ++i) {
+                        for (j = 0; j < Stc.Game.TETROMINO_SIZE; ++j) {
+                            if (this.m_game.nextBlock().cells[i][j] != Stc.Game.EMPTY_CELL) {
                                 this.drawTile(PlatformHTML5.PREVIEW_X + (PlatformHTML5.TILE_SIZE * i), PlatformHTML5.PREVIEW_Y + (PlatformHTML5.TILE_SIZE * j), this.m_game.nextBlock().cells[i][j], false);
                             }
                         }
@@ -973,26 +967,26 @@ var Stc;
                 }
                 // Draw shadow tetromino
                 if (this.m_game.showShadow() && this.m_game.shadowGap() > 0) {
-                    for (i = 0; i < Game.TETROMINO_SIZE; ++i) {
-                        for (j = 0; j < Game.TETROMINO_SIZE; ++j) {
-                            if (this.m_game.fallingBlock().cells[i][j] != Game.EMPTY_CELL) {
+                    for (i = 0; i < Stc.Game.TETROMINO_SIZE; ++i) {
+                        for (j = 0; j < Stc.Game.TETROMINO_SIZE; ++j) {
+                            if (this.m_game.fallingBlock().cells[i][j] != Stc.Game.EMPTY_CELL) {
                                 this.drawTile(PlatformHTML5.BOARD_X + (PlatformHTML5.TILE_SIZE * (this.m_game.fallingBlock().x + i)), PlatformHTML5.BOARD_Y + (PlatformHTML5.TILE_SIZE * (this.m_game.fallingBlock().y + this.m_game.shadowGap() + j)), this.m_game.fallingBlock().cells[i][j], true);
                             }
                         }
                     }
                 }
                 // Draw the cells in the board
-                for (i = 0; i < Game.BOARD_TILEMAP_WIDTH; ++i) {
-                    for (j = 0; j < Game.BOARD_TILEMAP_HEIGHT; ++j) {
-                        if (this.m_game.getCell(i, j) != Game.EMPTY_CELL) {
+                for (i = 0; i < Stc.Game.BOARD_TILEMAP_WIDTH; ++i) {
+                    for (j = 0; j < Stc.Game.BOARD_TILEMAP_HEIGHT; ++j) {
+                        if (this.m_game.getCell(i, j) != Stc.Game.EMPTY_CELL) {
                             this.drawTile(PlatformHTML5.BOARD_X + (PlatformHTML5.TILE_SIZE * i), PlatformHTML5.BOARD_Y + (PlatformHTML5.TILE_SIZE * j), this.m_game.getCell(i, j), false);
                         }
                     }
                 }
                 // Draw falling tetromino
-                for (i = 0; i < Game.TETROMINO_SIZE; ++i) {
-                    for (j = 0; j < Game.TETROMINO_SIZE; ++j) {
-                        if (this.m_game.fallingBlock().cells[i][j] != Game.EMPTY_CELL) {
+                for (i = 0; i < Stc.Game.TETROMINO_SIZE; ++i) {
+                    for (j = 0; j < Stc.Game.TETROMINO_SIZE; ++j) {
+                        if (this.m_game.fallingBlock().cells[i][j] != Stc.Game.EMPTY_CELL) {
                             this.drawTile(PlatformHTML5.BOARD_X + (PlatformHTML5.TILE_SIZE * (this.m_game.fallingBlock().x + i)), PlatformHTML5.BOARD_Y + (PlatformHTML5.TILE_SIZE * (this.m_game.fallingBlock().y + j)), this.m_game.fallingBlock().cells[i][j], false);
                         }
                     }
@@ -1001,17 +995,17 @@ var Stc;
                 if (!this.m_game.isPaused()) {
                     // Clear stats canvas.
                     this.m_canvasStats.clearRect(0, 0, PlatformHTML5.SCREEN_WIDTH, PlatformHTML5.SCREEN_HEIGHT);
-                    this.drawNumber(PlatformHTML5.LEVEL_X, PlatformHTML5.LEVEL_Y, this.m_game.stats().level, PlatformHTML5.LEVEL_LENGTH, Game.COLOR_WHITE);
-                    this.drawNumber(PlatformHTML5.LINES_X, PlatformHTML5.LINES_Y, this.m_game.stats().lines, PlatformHTML5.LINES_LENGTH, Game.COLOR_WHITE);
-                    this.drawNumber(PlatformHTML5.SCORE_X, PlatformHTML5.SCORE_Y, this.m_game.stats().score, PlatformHTML5.SCORE_LENGTH, Game.COLOR_WHITE);
-                    this.drawNumber(PlatformHTML5.TETROMINO_X, PlatformHTML5.TETROMINO_L_Y, this.m_game.stats().pieces[Game.TETROMINO_L], PlatformHTML5.TETROMINO_LENGTH, Game.COLOR_ORANGE);
-                    this.drawNumber(PlatformHTML5.TETROMINO_X, PlatformHTML5.TETROMINO_I_Y, this.m_game.stats().pieces[Game.TETROMINO_I], PlatformHTML5.TETROMINO_LENGTH, Game.COLOR_CYAN);
-                    this.drawNumber(PlatformHTML5.TETROMINO_X, PlatformHTML5.TETROMINO_T_Y, this.m_game.stats().pieces[Game.TETROMINO_T], PlatformHTML5.TETROMINO_LENGTH, Game.COLOR_PURPLE);
-                    this.drawNumber(PlatformHTML5.TETROMINO_X, PlatformHTML5.TETROMINO_S_Y, this.m_game.stats().pieces[Game.TETROMINO_S], PlatformHTML5.TETROMINO_LENGTH, Game.COLOR_GREEN);
-                    this.drawNumber(PlatformHTML5.TETROMINO_X, PlatformHTML5.TETROMINO_Z_Y, this.m_game.stats().pieces[Game.TETROMINO_Z], PlatformHTML5.TETROMINO_LENGTH, Game.COLOR_RED);
-                    this.drawNumber(PlatformHTML5.TETROMINO_X, PlatformHTML5.TETROMINO_O_Y, this.m_game.stats().pieces[Game.TETROMINO_O], PlatformHTML5.TETROMINO_LENGTH, Game.COLOR_YELLOW);
-                    this.drawNumber(PlatformHTML5.TETROMINO_X, PlatformHTML5.TETROMINO_J_Y, this.m_game.stats().pieces[Game.TETROMINO_J], PlatformHTML5.TETROMINO_LENGTH, Game.COLOR_BLUE);
-                    this.drawNumber(PlatformHTML5.PIECES_X, PlatformHTML5.PIECES_Y, this.m_game.stats().totalPieces, PlatformHTML5.PIECES_LENGTH, Game.COLOR_WHITE);
+                    this.drawNumber(PlatformHTML5.LEVEL_X, PlatformHTML5.LEVEL_Y, this.m_game.stats().level, PlatformHTML5.LEVEL_LENGTH, Stc.Game.COLOR_WHITE);
+                    this.drawNumber(PlatformHTML5.LINES_X, PlatformHTML5.LINES_Y, this.m_game.stats().lines, PlatformHTML5.LINES_LENGTH, Stc.Game.COLOR_WHITE);
+                    this.drawNumber(PlatformHTML5.SCORE_X, PlatformHTML5.SCORE_Y, this.m_game.stats().score, PlatformHTML5.SCORE_LENGTH, Stc.Game.COLOR_WHITE);
+                    this.drawNumber(PlatformHTML5.TETROMINO_X, PlatformHTML5.TETROMINO_L_Y, this.m_game.stats().pieces[Stc.Game.TETROMINO_L], PlatformHTML5.TETROMINO_LENGTH, Stc.Game.COLOR_ORANGE);
+                    this.drawNumber(PlatformHTML5.TETROMINO_X, PlatformHTML5.TETROMINO_I_Y, this.m_game.stats().pieces[Stc.Game.TETROMINO_I], PlatformHTML5.TETROMINO_LENGTH, Stc.Game.COLOR_CYAN);
+                    this.drawNumber(PlatformHTML5.TETROMINO_X, PlatformHTML5.TETROMINO_T_Y, this.m_game.stats().pieces[Stc.Game.TETROMINO_T], PlatformHTML5.TETROMINO_LENGTH, Stc.Game.COLOR_PURPLE);
+                    this.drawNumber(PlatformHTML5.TETROMINO_X, PlatformHTML5.TETROMINO_S_Y, this.m_game.stats().pieces[Stc.Game.TETROMINO_S], PlatformHTML5.TETROMINO_LENGTH, Stc.Game.COLOR_GREEN);
+                    this.drawNumber(PlatformHTML5.TETROMINO_X, PlatformHTML5.TETROMINO_Z_Y, this.m_game.stats().pieces[Stc.Game.TETROMINO_Z], PlatformHTML5.TETROMINO_LENGTH, Stc.Game.COLOR_RED);
+                    this.drawNumber(PlatformHTML5.TETROMINO_X, PlatformHTML5.TETROMINO_O_Y, this.m_game.stats().pieces[Stc.Game.TETROMINO_O], PlatformHTML5.TETROMINO_LENGTH, Stc.Game.COLOR_YELLOW);
+                    this.drawNumber(PlatformHTML5.TETROMINO_X, PlatformHTML5.TETROMINO_J_Y, this.m_game.stats().pieces[Stc.Game.TETROMINO_J], PlatformHTML5.TETROMINO_LENGTH, Stc.Game.COLOR_BLUE);
+                    this.drawNumber(PlatformHTML5.PIECES_X, PlatformHTML5.PIECES_Y, this.m_game.stats().totalPieces, PlatformHTML5.PIECES_LENGTH, Stc.Game.COLOR_WHITE);
                 }
                 if (this.m_game.isOver()) {
                     this.showOverlay("Game is over");
@@ -1030,7 +1024,7 @@ var Stc;
             return Math.floor(9007199254740992 * Math.random());
         };
         PlatformHTML5.prototype.drawTile = function (x, y, tile, shadow) {
-            this.m_canvas.drawImage(this.m_image, PlatformHTML5.TILE_SIZE * (shadow ? Game.TETROMINO_TYPES + tile + 1 : tile), 0, PlatformHTML5.TILE_SIZE, PlatformHTML5.TILE_SIZE, x, y, PlatformHTML5.TILE_SIZE, PlatformHTML5.TILE_SIZE);
+            this.m_canvas.drawImage(this.m_image, PlatformHTML5.TILE_SIZE * (shadow ? Stc.Game.TETROMINO_TYPES + tile + 1 : tile), 0, PlatformHTML5.TILE_SIZE, PlatformHTML5.TILE_SIZE, x, y, PlatformHTML5.TILE_SIZE, PlatformHTML5.TILE_SIZE);
         };
         PlatformHTML5.prototype.drawNumber = function (x, y, value, length, color) {
             var pos = 0;
@@ -1105,22 +1099,4 @@ var Stc;
     }());
     Stc.PlatformHTML5 = PlatformHTML5;
 })(Stc || (Stc = {}));
-window.onload = function () {
-    // [iPhone] hiding Safari user interface components
-    // http://stackoverflow.com/questions/273671/hiding-safari-user-interface-components-on-iphone
-    setTimeout(function () { window.scrollTo(0, 1); }, 0);
-    // Start loading the image with all game elements.
-    var image = new Image();
-    image.src = "stc_sprites.png";
-    // Start game after image has loaded.
-    image.onload = function () {
-        var platform = new Stc.PlatformHTML5(image);
-        var game = new Stc.Game();
-        game.init(platform);
-        function update() {
-            game.update();
-        }
-        setInterval(update, 1000 / Stc.PlatformHTML5.FPS);
-    };
-};
 //# sourceMappingURL=main.js.map
