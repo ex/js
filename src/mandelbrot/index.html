@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <title>Mandelbrot</title>
+    <style>
+        canvas {
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+        }
+    </style>
+    <script type="module">
+        import { Mandelbrot } from './mandelbrot.js';
+        const canvas = document.getElementById('fractalCanvas');
+        const mandelbrot = new Mandelbrot(canvas);
+
+        // Focus canvas so it receives keyboard events
+        canvas.tabIndex = 1;
+        canvas.focus();
+    </script>
+</head>
+<body style="background-color:#000000">
+    <canvas id="fractalCanvas" width="800" height="600"></canvas>
+</body>
+</html>
+
