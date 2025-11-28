@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AS3 to ES6 Conversion</title>
+    <style>
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background: #333; margin: 0; }
+        canvas { background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body>
+
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+    <script type="module">
+        import Main from './Main.js';
+
+        // Wait for DOM to be ready (Equivalent to ADDED_TO_STAGE check)
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('gameCanvas');
+            const game = new Main(canvas);
+        });
+    </script>
+
+</body>
+</html>
