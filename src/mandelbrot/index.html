@@ -11,17 +11,12 @@
         }
     </style>
     <script type="module">
-        import Mandelbrot from './mandelbrot.js';
-        const canvas = document.getElementById('fractalCanvas');
-        const mandelbrot = new Mandelbrot(canvas);
-
-        // Focus canvas so it receives keyboard events
-        canvas.tabIndex = 1;
-        canvas.focus();
+        import { Mandelbrot } from './mandelbrot.js';
+        const mandelbrot = new Mandelbrot(document.getElementById('container'));
     </script>
 </head>
 <body style="background-color:#000000">
-    <canvas id="fractalCanvas" width="800" height="600"></canvas>
+    <div id="container" style="width:800px; height:600px"></div>
 </body>
 </html>
 
