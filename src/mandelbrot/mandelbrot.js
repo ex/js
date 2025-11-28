@@ -1,171 +1,148 @@
-/**
- * Mandelbrot Set Visualizer
- * Ported from ActionScript 3 to ES6 JavaScript + HTML5 Canvas
- */
+/* ========================================================================== */
+/*   Mandelbrot.js                                                            */
+/* -------------------------------------------------------------------------- */
+/*   Converted from AS3 to ES6 JavaScript by a senior developer.              */
+/*   Original Copyright (c) 2012 Laurens Rodriguez Oscanoa.                   */
+/*   This code is licensed under the MIT license:                             */
+/*   http://www.opensource.org/licenses/mit-license.php                       */
+/* -------------------------------------------------------------------------- */
 
-export class Mandelbrot {
-    constructor(canvasElement) {
-        // --- Configuration Constants ---
-        this.INIT_STEPS = 256;
-        this.INCREMENT_STEPS = 64;
+// Constants
+const INIT_STEPS = 256;
+const INCREMENT_STEPS = 64;
 
-        this.MINIMUM_COLOR_STEP = 5;
-        this.COLOR_RANGE = 64;
-        this.COLOR_STEP = 6;
+const MINIMUM_COLOR_STEP = 5;
+const COLOR_RANGE = 64;
+const COLOR_STEP = 6;
 
-        this.COLOR_BLUE = 1;
-        this.COLOR_RED = 2;
-        this.COLOR_GREEN = 3;
-        this.COLOR_GRAY = 4;
-        this.COLOR_RANDOM = 5;
-        this.COLOR_PALETTE = 6;
+const COLOR_BLUE = 1;
+const COLOR_RED = 2;
+const COLOR_GREEN = 3;
+const COLOR_GRAY = 4;
+const COLOR_RANDOM = 5;
+const COLOR_PALETTE = 6;
 
-        this.MINIMUM_CELL_SIZE = 9e-15;
+const MINIMUM_CELL_SIZE = 9e-15;
 
-        this.FRACTAL_GRID_CELLS = 8;
-        this.ZOOM_GRID_CELLS = 4;
+// The fractal zone and the zoom zone are divided in cells.
+const FRACTAL_GRID_CELLS = 8;
+const ZOOM_GRID_CELLS = 4;
 
-        // --- Setup Canvas ---
-        this.canvas = canvasElement;
-        this.ctx = this.canvas.getContext('2d', { alpha: false });
 
-        this.m_width = this.canvas.width;
-        this.m_height = this.canvas.height;
+export default class Mandelbrot {
 
-        // Create offscreen buffers to mimic AS3 BitmapLayers
-        // Layer 1: The Fractal (Static background)
-        this.fractalCanvas = document.createElement('canvas');
-        this.fractalCanvas.width = this.m_width;
-        this.fractalCanvas.height = this.m_height;
-        this.fractalCtx = this.fractalCanvas.getContext('2d');
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = this.canvas.getContext('2d');
+        this.width = this.canvas.width;
+        this.height = this.canvas.height;
+        
+        // Create an off-screen canvas for the fractal (equivalent to BitmapData)
+        this.backBufferCanvas = document.createElement('canvas');
+        this.backBufferCanvas.width = this.width;
+        this.backBufferCanvas.height = this.height;
+        this.backBufferCtx = this.backBufferCanvas.getContext('2d');
+        this.imageData = this.backBufferCtx.createImageData(this.width, this.height);
 
-        // Layer 2: The UI/Zoom Box (Dynamic foreground)
-        this.uiCanvas = document.createElement('canvas');
-        this.uiCanvas.width = this.m_width;
-        this.uiCanvas.height = this.m_height;
-        this.uiCtx = this.uiCanvas.getContext('2d');
-
-        // --- State Initialization ---
-        this.m_steps = this.INIT_STEPS;
-        this.m_zoomIsVisible = false;
-        this.m_zones = [];
+        this.steps = INIT_STEPS;
+        this.zoomIsVisible = false;
+        this.zones = [];
 
         // Zoom zone init position
-        this.m_zoomGridX = (this.FRACTAL_GRID_CELLS - this.ZOOM_GRID_CELLS) / 2;
-        this.m_zoomGridY = (this.FRACTAL_GRID_CELLS - this.ZOOM_GRID_CELLS) / 2;
+        this.zoomGridX = this.zoomGridY = (FRACTAL_GRID_CELLS - ZOOM_GRID_CELLS) / 2;
 
-        // Initialize color data
         this.initializeColorData();
-        this.setColors(this.COLOR_PALETTE);
+        this.setColors(COLOR_PALETTE);
 
-        // Bind Events
-        window.addEventListener('keydown', this.onKeyDown.bind(this));
-
-        // Initial Draw
         this.drawMandelbrot(true);
-
-        // Start the composition loop
-        this.renderLoop();
-    }
-
-    /**
-     * Main rendering loop (replaces ENTER_FRAME for display updates)
-     * Composes the background fractal and foreground UI.
-     */
-    renderLoop() {
-        // Clear main screen
-        this.ctx.clearRect(0, 0, this.m_width, this.m_height);
-
-        // Draw Fractal Layer
-        this.ctx.drawImage(this.fractalCanvas, 0, 0);
-
-        // Draw UI Layer (Zoom Box)
-        this.ctx.drawImage(this.uiCanvas, 0, 0);
-
-        requestAnimationFrame(() => this.renderLoop());
+        
+        window.addEventListener('keydown', this.onKeyDown.bind(this));
     }
 
     onKeyDown(evt) {
-        // Map JS Key codes to Logic
-        switch(evt.code) {
-            case 'KeyW':
-            case 'ArrowUp':
+        // Prevent browser default actions for keys like arrows, space, etc.
+        evt.preventDefault();
+        
+        switch(evt.keyCode) {
+            case 87: // W
+            case 38: // UP
                 this.moveZoomUp();
                 break;
-            case 'KeyS':
-            case 'ArrowDown':
+            case 83: // S
+            case 40: // DOWN
                 this.moveZoomDown();
                 break;
-            case 'KeyA':
-            case 'ArrowLeft':
+            case 65: // A
+            case 37: // LEFT
                 this.moveZoomLeft();
                 break;
-            case 'KeyD':
-            case 'ArrowRight':
+            case 68: // D
+            case 39: // RIGHT
                 this.moveZoomRight();
                 break;
-            case 'Space':
-            case 'Enter':
+            case 32: // SPACE
+            case 13: // ENTER
                 this.redraw();
                 break;
-            case 'F4':
-                this.setColors(this.COLOR_PALETTE);
+            case 115: // F4
+                this.setColors(COLOR_PALETTE);
                 this.drawMandelbrot();
                 break;
-            case 'F5':
-                this.setColors(this.COLOR_RANDOM);
+            case 116: // F5
+                this.setColors(COLOR_RANDOM);
                 this.drawMandelbrot();
                 break;
-            case 'F6':
-                this.setColors(this.COLOR_RED);
+            case 117: // F6
+                this.setColors(COLOR_RED);
                 this.drawMandelbrot();
                 break;
-            case 'F7':
-                this.setColors(this.COLOR_GREEN);
+            case 118: // F7
+                this.setColors(COLOR_GREEN);
                 this.drawMandelbrot();
                 break;
-            case 'F8':
-                this.setColors(this.COLOR_BLUE);
+            case 119: // F8
+                this.setColors(COLOR_BLUE);
                 this.drawMandelbrot();
                 break;
-            case 'F9':
-                this.setColors(this.COLOR_GRAY);
+            case 120: // F9
+                this.setColors(COLOR_GRAY);
                 this.drawMandelbrot();
                 break;
-            case 'Backspace':
+            case 8: // BACKSPACE
                 this.zoomOut();
                 break;
-            case 'Escape':
-            case 'ControlLeft':
-            case 'ControlRight':
+            case 27: // ESCAPE
+            case 17: // CONTROL
                 this.toggleZoomZone();
                 break;
-            case 'Home':
+            case 36: // HOME
                 this.drawMandelbrot(true);
                 break;
-            case 'PageUp':
-                this.increaseSteps(this.INCREMENT_STEPS);
+            case 33: // PAGE_UP
+                this.increaseSteps(INCREMENT_STEPS);
                 break;
-            case 'PageDown':
-                this.increaseSteps(-this.INCREMENT_STEPS);
+            case 34: // PAGE_DOWN
+                this.increaseSteps(-INCREMENT_STEPS);
                 break;
         }
     }
 
     redraw() {
-        if (this.m_zoomIsVisible) {
-            const dx = (this.m_fractalZoneX2 - this.m_fractalZoneX1) / this.FRACTAL_GRID_CELLS;
-            const dy = (this.m_fractalZoneY2 - this.m_fractalZoneY1) / this.FRACTAL_GRID_CELLS;
+        if (this.zoomIsVisible) {
+            // If the zoom grid is visible we want to redraw the zoom zone.
+            const dx = (this.fractalZoneX2 - this.fractalZoneX1) / FRACTAL_GRID_CELLS;
+            const dy = (this.fractalZoneY2 - this.fractalZoneY1) / FRACTAL_GRID_CELLS;
 
-            if ((dx >= this.MINIMUM_CELL_SIZE) && (dy >= this.MINIMUM_CELL_SIZE)) {
+            if ((dx >= MINIMUM_CELL_SIZE) && (dy >= MINIMUM_CELL_SIZE)) {
+
                 // Save actual zone position
-                this.m_zones.push([this.m_fractalZoneX1, this.m_fractalZoneY1, this.m_fractalZoneX2, this.m_fractalZoneY2]);
+                this.zones.push([this.fractalZoneX1, this.fractalZoneY1, this.fractalZoneX2, this.fractalZoneY2]);
 
-                // Set new drawing zone
-                this.m_fractalZoneX1 += (this.m_zoomGridX * dx);
-                this.m_fractalZoneY1 += (this.m_zoomGridY * dy);
-                this.m_fractalZoneX2 = this.m_fractalZoneX1 + this.ZOOM_GRID_CELLS * dx;
-                this.m_fractalZoneY2 = this.m_fractalZoneY1 + this.ZOOM_GRID_CELLS * dy;
+                // Set new drawing zone. (x1,y1) bottom-left corner, (x2,y2) up-right corner
+                this.fractalZoneX1 += (this.zoomGridX * dx);
+                this.fractalZoneY1 += (this.zoomGridY * dy);
+                this.fractalZoneX2 = this.fractalZoneX1 + ZOOM_GRID_CELLS * dx;
+                this.fractalZoneY2 = this.fractalZoneY1 + ZOOM_GRID_CELLS * dy;
 
                 this.drawMandelbrot();
             }
@@ -175,263 +152,266 @@ export class Mandelbrot {
     }
 
     increaseSteps(increment) {
-        if (this.m_steps + increment > 0) {
-            this.m_steps += increment;
-            console.log(`Iterations: ${this.m_steps}`);
+        if (this.steps + increment > 0) {
+            this.steps += increment;
             this.drawMandelbrot();
         }
     }
 
     zoomOut() {
-        if (this.m_zoomIsVisible) {
+        if (this.zoomIsVisible) {
             this.toggleZoomZone();
         }
-
-        if (this.m_zones.length > 0) {
-            const zone = this.m_zones.pop();
-            this.m_fractalZoneX1 = zone[0];
-            this.m_fractalZoneY1 = zone[1];
-            this.m_fractalZoneX2 = zone[2];
-            this.m_fractalZoneY2 = zone[3];
+        if (this.zones.length > 0) {
+            const zone = this.zones.pop();
+            this.fractalZoneX1 = zone[0];
+            this.fractalZoneY1 = zone[1];
+            this.fractalZoneX2 = zone[2];
+            this.fractalZoneY2 = zone[3];
         } else {
-            const dx = (this.m_fractalZoneX2 - this.m_fractalZoneX1) / 2;
-            const dy = (this.m_fractalZoneY2 - this.m_fractalZoneY1) / 2;
-            this.m_fractalZoneX1 -= dx;
-            this.m_fractalZoneY1 -= dy;
-            this.m_fractalZoneX2 += dx;
-            this.m_fractalZoneY2 += dy;
+            const dx = (this.fractalZoneX2 - this.fractalZoneX1) / 2;
+            const dy = (this.fractalZoneY2 - this.fractalZoneY1) / 2;
+            this.fractalZoneX1 -= dx;
+            this.fractalZoneY1 -= dy;
+            this.fractalZoneX2 += dx;
+            this.fractalZoneY2 += dy;
         }
         this.drawMandelbrot();
     }
 
     drawMandelbrot(initializeZone = false) {
-        if (this.m_zoomIsVisible) {
+
+        if (this.zoomIsVisible) {
             this.toggleZoomZone();
         }
-
         if (initializeZone) {
-            this.m_fractalZoneX1 = -2.5;
-            this.m_fractalZoneY1 = -1.2;
-            this.m_fractalZoneX2 = 0.7;
-            this.m_fractalZoneY2 = 1.2;
-            this.m_zones = []; // Clear history on reset
+            this.fractalZoneX1 = -2.5;
+            this.fractalZoneY1 = -1.2;
+            this.fractalZoneX2 = 0.7;
+            this.fractalZoneY2 = 1.2;
         }
 
-        const width = this.m_width;
-        const height = this.m_height;
-        const dx = (this.m_fractalZoneX2 - this.m_fractalZoneX1) / (width - 1);
-        const dy = (this.m_fractalZoneY2 - this.m_fractalZoneY1) / (height - 1);
+        const dx = (this.fractalZoneX2 - this.fractalZoneX1) / (this.width - 1);
+        const dy = (this.fractalZoneY2 - this.fractalZoneY1) / (this.height - 1);
 
-        // Access raw pixel data
-        const imageData = this.fractalCtx.createImageData(width, height);
-        const data = imageData.data; // Uint8ClampedArray
+        const data = this.imageData.data;
 
         // Draw fractal zone
-        // Note: JS numbers are always doubles, but we use |0 to hint integers for indices
-        for (let x = 0; x < width; ++x) {
-            for (let y = 0; y < height; ++y) {
-
+        for (let x = 0; x < this.width; ++x) {
+            for (let y = 0; y < this.height; ++y) {
                 // Point in fractal zone
-                const px = this.m_fractalZoneX1 + x * dx;
-                const py = this.m_fractalZoneY2 - y * dy;
+                const px = this.fractalZoneX1 + x * dx;
+                const py = this.fractalZoneY2 - y * dy;
 
+                // Iterate fractal computation.
                 let steps = 0;
                 let fx = 0.0;
                 let fy = 0.0;
-                let temp = 0.0;
+                let temp;
 
                 while (true) {
+                    // Mandelbrot recurrence:
+                    // ---------------------
+                    // F(n+1) = F(n)*F(n) + (px + i*py)
                     temp = fx * fx - fy * fy + px;
                     fy = 2 * fx * fy + py;
                     fx = temp;
+
                     steps++;
 
-                    if ((steps >= this.m_steps) || (fx * fx + fy * fy >= 4.0)) {
+                    // F(z) belongs to Mandelbrot set if |F(z)| < 2
+                    // We give up if we passed the limit of number of iterations.
+                    if ((steps >= this.steps) || (fx * fx + fy * fy >= 4.0)) {
                         break;
                     }
                 }
 
-                const pixelIndex = (y * width + x) * 4;
-
-                if (steps < this.m_steps) {
-                    // |F(z)| >= 2, not in set
+                const pixelIndex = (y * this.width + x) * 4;
+                if (steps < this.steps) {
+                    // We found that: |F(z)| >= 2 (the point doesn't belong to the Mandelbrot set)
                     let indexColor = (steps - 1) % 28 + 1;
                     if (indexColor > 15) {
                         indexColor = 30 - indexColor;
                     }
-
-                    // Get RGB components from our color table
-                    const rgb = this.m_colors[indexColor]; // [r, g, b]
-
-                    data[pixelIndex]     = rgb[0]; // Red
-                    data[pixelIndex + 1] = rgb[1]; // Green
-                    data[pixelIndex + 2] = rgb[2]; // Blue
-                    data[pixelIndex + 3] = 255;    // Alpha
+                    const color = this.colors[indexColor];
+                    data[pixelIndex] = color[0];     // R
+                    data[pixelIndex + 1] = color[1]; // G
+                    data[pixelIndex + 2] = color[2]; // B
+                    data[pixelIndex + 3] = 255;      // A
                 } else {
-                    // In set (Black)
-                    data[pixelIndex]     = 0;
+                    // We suspect this point belongs to the Mandelbrot set.
+                    data[pixelIndex] = 0;
                     data[pixelIndex + 1] = 0;
                     data[pixelIndex + 2] = 0;
                     data[pixelIndex + 3] = 255;
                 }
             }
         }
-
-        // Put the data onto the offscreen fractal canvas
-        this.fractalCtx.putImageData(imageData, 0, 0);
+        
+        // Put the generated image data onto the off-screen canvas
+        this.backBufferCtx.putImageData(this.imageData, 0, 0);
+        // Draw the off-screen canvas to the visible canvas
+        this.ctx.drawImage(this.backBufferCanvas, 0, 0);
     }
 
     setColors(opc) {
-        this.m_colors = [];
-        let k = 0;
+        this.colors = [];
 
         switch (opc) {
-            case this.COLOR_GRAY:
-                for (k = 0; k < 16; k++) {
-                    this.m_colors.push([4*this.m_colorSteps[k][1], 4*this.m_colorSteps[k][1], 4*this.m_colorSteps[k][1]]);
+            case COLOR_GRAY:
+                for (let k = 0; k < 16; k++) {
+                    this.colors.push([4 * this.colorSteps[k][1], 4 * this.colorSteps[k][1], 4 * this.colorSteps[k][1]]);
                 }
                 break;
-            case this.COLOR_BLUE:
-                for (k = 0; k < 16; k++) {
-                    this.m_colors.push([4*this.m_colorSteps[k][0], 4*this.m_colorSteps[k][1], 4*this.m_colorSteps[k][2]]);
+            case COLOR_BLUE:
+                for (let k = 0; k < 16; k++) {
+                    this.colors.push([4 * this.colorSteps[k][0], 4 * this.colorSteps[k][1], 4 * this.colorSteps[k][2]]);
                 }
                 break;
-            case this.COLOR_RED:
-                for (k = 0; k < 16; k++) {
-                    this.m_colors.push([4*this.m_colorSteps[k][2], 13 * k, 3*this.m_colorSteps[k][0]]);
+            case COLOR_RED:
+                for (let k = 0; k < 16; k++) {
+                    this.colors.push([4 * this.colorSteps[k][2], 13 * k, 3 * this.colorSteps[k][0]]);
                 }
                 break;
-            case this.COLOR_GREEN:
-                for (k = 0; k < 16; k++) {
-                    this.m_colors.push([14 * k, 4*this.m_colorSteps[k][2], 4*this.m_colorSteps[k][0]]);
+            case COLOR_GREEN:
+                for (let k = 0; k < 16; k++) {
+                    this.colors.push([14 * k, 4 * this.colorSteps[k][2], 4 * this.colorSteps[k][0]]);
                 }
                 break;
-            case this.COLOR_RANDOM:
+            case COLOR_RANDOM:
                 let c1, c2, c3;
                 do {
-                    c1 = this.COLOR_STEP * Math.random();
-                    c2 = this.COLOR_STEP * Math.random();
-                    c3 = this.COLOR_STEP * Math.random();
-                } while ((c1 + c2 + c3) < this.MINIMUM_COLOR_STEP);
+                    c1 = COLOR_STEP * Math.random();
+                    c2 = COLOR_STEP * Math.random();
+                    c3 = COLOR_STEP * Math.random();
+                } while ((c1 + c2 + c3) < MINIMUM_COLOR_STEP);
 
-                this.m_colors.push([0, 0, 0]);
+                this.colors.push([0, 0, 0]); // base color is black
 
-                const a1 = Math.floor(this.COLOR_RANGE * Math.random());
-                const a2 = Math.floor(this.COLOR_RANGE * Math.random());
-                const a3 = Math.floor(this.COLOR_RANGE * Math.random());
+                const a1 = COLOR_RANGE * Math.random();
+                const a2 = COLOR_RANGE * Math.random();
+                const a3 = COLOR_RANGE * Math.random();
 
-                for (k = 1; k < 16; ++k) {
-                    let t1 = Math.floor((a1 + (k - 1) * c1) % (this.COLOR_RANGE * 2));
-                    let t2 = Math.floor((a2 + (k - 1) * c2) % (this.COLOR_RANGE * 2));
-                    let t3 = Math.floor((a3 + (k - 1) * c3) % (this.COLOR_RANGE * 2));
+                // Fill color table.
+                for (let k = 1; k < 16; ++k) {
+                    let t1 = (a1 + (k - 1) * c1) % (COLOR_RANGE * 2);
+                    let t2 = (a2 + (k - 1) * c2) % (COLOR_RANGE * 2);
+                    let t3 = (a3 + (k - 1) * c3) % (COLOR_RANGE * 2);
 
-                    if (t1 >= this.COLOR_RANGE) t1 = (this.COLOR_RANGE * 2) - t1 - 1;
-                    if (t2 >= this.COLOR_RANGE) t2 = (this.COLOR_RANGE * 2) - t2 - 1;
-                    if (t3 >= this.COLOR_RANGE) t3 = (this.COLOR_RANGE * 2) - t3 - 1;
-
-                    this.m_colors.push([4*t1, 4*t2, 4*t3]);
+                    if (t1 >= COLOR_RANGE) t1 = (COLOR_RANGE * 2) - t1 - 1;
+                    if (t2 >= COLOR_RANGE) t2 = (COLOR_RANGE * 2) - t2 - 1;
+                    if (t3 >= COLOR_RANGE) t3 = (COLOR_RANGE * 2) - t3 - 1;
+                    
+                    this.colors.push([4 * t1, 4 * t2, 4 * t3]);
                 }
                 break;
+            case COLOR_PALETTE:
+                const paletteIndex = Math.floor(Math.random() * this.palette.length);
+                this.colors.push([0, 0, 0]); // base color is black
 
-            case this.COLOR_PALETTE:
-                const paletteIdx = Math.floor(Math.random() * this.m_palette.length);
-                this.m_colors.push([0, 0, 0]);
+                // Fill color table.
+                for (let k = 1; k < 16; ++k) {
+                    let p1 = (this.palette[paletteIndex][0] + (k - 1) * this.palette[paletteIndex][1]) % (COLOR_RANGE * 2);
+                    let p2 = (this.palette[paletteIndex][2] + (k - 1) * this.palette[paletteIndex][3]) % (COLOR_RANGE * 2);
+                    let p3 = (this.palette[paletteIndex][4] + (k - 1) * this.palette[paletteIndex][5]) % (COLOR_RANGE * 2);
 
-                for (k = 1; k < 16; ++k) {
-                    let p1 = Math.floor((this.m_palette[paletteIdx][0] + (k - 1) * this.m_palette[paletteIdx][1]) % (this.COLOR_RANGE * 2));
-                    let p2 = Math.floor((this.m_palette[paletteIdx][2] + (k - 1) * this.m_palette[paletteIdx][3]) % (this.COLOR_RANGE * 2));
-                    let p3 = Math.floor((this.m_palette[paletteIdx][4] + (k - 1) * this.m_palette[paletteIdx][5]) % (this.COLOR_RANGE * 2));
+                    if (p1 >= COLOR_RANGE) p1 = (COLOR_RANGE * 2) - p1 - 1;
+                    if (p2 >= COLOR_RANGE) p2 = (COLOR_RANGE * 2) - p2 - 1;
+                    if (p3 >= COLOR_RANGE) p3 = (COLOR_RANGE * 2) - p3 - 1;
 
-                    if (p1 >= this.COLOR_RANGE) p1 = (this.COLOR_RANGE * 2) - p1 - 1;
-                    if (p2 >= this.COLOR_RANGE) p2 = (this.COLOR_RANGE * 2) - p2 - 1;
-                    if (p3 >= this.COLOR_RANGE) p3 = (this.COLOR_RANGE * 2) - p3 - 1;
-
-                    this.m_colors.push([4*p1, 4*p2, 4*p3]);
+                    this.colors.push([4 * p1, 4 * p2, 4 * p3]);
                 }
                 break;
         }
     }
 
-    drawZoomZone() {
-        // Clear previous UI drawing
-        this.uiCtx.clearRect(0, 0, this.m_width, this.m_height);
-
-        if (!this.m_zoomIsVisible) return;
-
-        const cellWidth = this.m_width / this.FRACTAL_GRID_CELLS;
-        const cellHeight = this.m_height / this.FRACTAL_GRID_CELLS;
-
-        const x1 = Math.floor(cellWidth * (this.m_zoomGridX));
-        const y1 = Math.floor(cellHeight * (this.FRACTAL_GRID_CELLS - this.m_zoomGridY));
-
-        // Note: AS3 coord logic for y was inverted or based on bottom-up logic in math,
-        // but screen coords are top-down. Adjusted slightly to match visual expectation.
-        // We calculate width/height based on grid cells.
-
-        const w = Math.floor(cellWidth * this.ZOOM_GRID_CELLS);
-        const h = Math.floor(cellHeight * this.ZOOM_GRID_CELLS);
-
-        // In AS3 code: y1 was bottom, y2 was top (subtracted ZOOM_GRID_CELLS).
-        // Let's replicate rect drawing.
-        const drawX = x1;
-        const drawY = y1 - h; // Move "up" (visually) because Y is inverted in math logic but standard in canvas
-
-        this.uiCtx.strokeStyle = 'white';
-        this.uiCtx.lineWidth = 1;
-        this.uiCtx.strokeRect(drawX, drawY, w, h);
+    drawRectangle(x1, y1, x2, y2, color) {
+        this.ctx.strokeStyle = color;
+        const rectX = Math.min(x1, x2);
+        const rectY = Math.min(y1, y2);
+        const rectW = Math.abs(x2 - x1);
+        const rectH = Math.abs(y2 - y1);
+        this.ctx.strokeRect(rectX, rectY, rectW, rectH);
     }
+    
+    drawZoomZone() {
+        // First, clear any existing zoom rectangle by redrawing the fractal from the back buffer
+        this.ctx.drawImage(this.backBufferCanvas, 0, 0);
 
+        const cellWidth = this.width / FRACTAL_GRID_CELLS;
+        const cellHeight = this.height / FRACTAL_GRID_CELLS;
+        
+        const x1 = Math.round(cellWidth * (this.zoomGridX));
+        const x2 = Math.round(cellWidth * (this.zoomGridX + ZOOM_GRID_CELLS));
+        
+        // Canvas y-coordinates start from the top, same as Flash
+        const y1 = Math.round(cellHeight * (this.zoomGridY));
+        const y2 = Math.round(cellHeight * (this.zoomGridY + ZOOM_GRID_CELLS));
+        
+        this.drawRectangle(x1, y1, x2, y2, 'white');
+        
+        this.zoomX1 = x1;
+        this.zoomY1 = y1;
+        this.zoomX2 = x2;
+        this.zoomY2 = y2;
+    }
+    
     toggleZoomZone() {
-        this.m_zoomIsVisible = !this.m_zoomIsVisible;
-        this.drawZoomZone();
+        this.zoomIsVisible = !this.zoomIsVisible;
+        if (this.zoomIsVisible) {
+            this.drawZoomZone();
+        } else {
+            // Erase the zoom rectangle by redrawing the fractal from the back buffer
+            this.ctx.drawImage(this.backBufferCanvas, 0, 0);
+        }
     }
 
     moveZoomLeft() {
-        if (!this.m_zoomIsVisible) {
+        if (!this.zoomIsVisible) {
             this.toggleZoomZone();
         } else {
-            if (this.m_zoomGridX > 0) {
-                --this.m_zoomGridX;
+            if (this.zoomGridX > 0) {
+                --this.zoomGridX;
                 this.drawZoomZone();
             }
         }
     }
 
     moveZoomRight() {
-        if (!this.m_zoomIsVisible) {
+        if (!this.zoomIsVisible) {
             this.toggleZoomZone();
         } else {
-            if (this.m_zoomGridX < this.FRACTAL_GRID_CELLS - this.ZOOM_GRID_CELLS) {
-                ++this.m_zoomGridX;
+            if (this.zoomGridX < FRACTAL_GRID_CELLS - ZOOM_GRID_CELLS) {
+                ++this.zoomGridX;
                 this.drawZoomZone();
             }
         }
     }
 
     moveZoomUp() {
-        if (!this.m_zoomIsVisible) {
+        if (!this.zoomIsVisible) {
             this.toggleZoomZone();
         } else {
-            if (this.m_zoomGridY < this.FRACTAL_GRID_CELLS - this.ZOOM_GRID_CELLS) {
-                ++this.m_zoomGridY;
+            if (this.zoomGridY > 0) {
+                --this.zoomGridY;
                 this.drawZoomZone();
             }
         }
     }
 
     moveZoomDown() {
-        if (!this.m_zoomIsVisible) {
+        if (!this.zoomIsVisible) {
             this.toggleZoomZone();
         } else {
-            if (this.m_zoomGridY > 0) {
-                --this.m_zoomGridY;
+            if (this.zoomGridY < FRACTAL_GRID_CELLS - ZOOM_GRID_CELLS) {
+                ++this.zoomGridY;
                 this.drawZoomZone();
             }
         }
     }
 
     initializeColorData() {
-        this.m_palette = [
+        this.palette = [
             [0, 4, 62, 5, 31, 3],  [7, 4, 4, 4, 42, 5],   [8, 0, 55, 4, 4, 4],   [8, 5, 8, 4, 8, 1],    [12, 4, 44, 2, 46, 3],
             [17, 4, 35, 5, 41, 4], [20, 5, 43, 4, 57, 3], [20, 5, 58, 5, 21, 2], [21, 2, 35, 4, 59, 0], [24, 4, 53, 2, 54, 3],
             [25, 2, 36, 2, 50, 2], [25, 5, 52, 5, 0, 5],  [27, 3, 19, 3, 31, 5], [27, 3, 35, 4, 39, 2], [29, 5, 63, 2, 34, 2],
@@ -446,9 +426,9 @@ export class Mandelbrot {
             [59, 5, 52, 3, 5, 0],  [60, 1, 51, 5, 0, 3],  [60, 5, 14, 2, 24, 3], [61, 5, 42, 5, 24, 3], [63, 4, 14, 3, 0, 5],
         ];
 
-        this.m_colorSteps = [[ 0,  0,  0], [10,  8, 23], [13, 16, 36], [15, 18, 41],
-                        [17, 21, 46], [18, 23, 49], [20, 26, 50], [22, 29, 52],
-                        [24, 35, 55], [22, 40, 58], [20, 45, 60], [17, 46, 61],
-                        [16, 47, 62], [25, 52, 62], [38, 58, 63], [63, 63, 63]];
+        this.colorSteps = [[ 0,  0,  0], [10,  8, 23], [13, 16, 36], [15, 18, 41],
+                           [17, 21, 46], [18, 23, 49], [20, 26, 50], [22, 29, 52],
+                           [24, 35, 55], [22, 40, 58], [20, 45, 60], [17, 46, 61],
+                           [16, 47, 62], [25, 52, 62], [38, 58, 63], [63, 63, 63]];
     }
 }
