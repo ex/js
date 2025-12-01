@@ -66,6 +66,9 @@ export class Mandelbrot {
         // Events
         window.addEventListener('keydown', (e) => this.onKeyDown(e));
 
+        // --- MOUSE SUPPORT ADDED HERE ---
+        this.canvasFront.addEventListener('mousedown', (e) => this.onMouseDown(e));
+
         // Initial Draw
         this.drawMandelbrot(true);
     }
@@ -80,6 +83,80 @@ export class Mandelbrot {
         canvas.style.zIndex = zIndex;
         this.container.appendChild(canvas);
         return canvas;
+    }
+
+    // --- NEW METHOD FOR MOUSE HANDLING ---
+    onMouseDown(evt) {
+        // Get mouse position relative to the canvas element
+        const rect = this.canvasFront.getBoundingClientRect();
+
+        // Calculate scaling factors in case canvas is resized via CSS
+        const scaleX = this.canvasFront.width / rect.width;
+        const scaleY = this.canvasFront.height / rect.height;
+
+        const mouseX = (evt.clientX - rect.left) * scaleX;
+        const mouseY = (evt.clientY - rect.top) * scaleY;
+
+        // Check if we are clicking inside the currently visible zoom zone
+        if (this.zoomIsVisible) {
+            const cellWidth = this.width / FRACTAL_GRID_CELLS;
+            const cellHeight = this.height / FRACTAL_GRID_CELLS;
+
+            // Calculate current visual bounds of the yellow box
+            const zRectLeft = cellWidth * this.zoomGridX;
+            const zRectRight = cellWidth * (this.zoomGridX + ZOOM_GRID_CELLS);
+
+            // Note: In this class logic, zoomGridY increases upwards (bottom-up),
+            // but canvas draws top-down. We must reconstruct the visual Y coordinates.
+            const zRectTop = cellHeight * (FRACTAL_GRID_CELLS - this.zoomGridY - ZOOM_GRID_CELLS);
+            const zRectBottom = cellHeight * (FRACTAL_GRID_CELLS - this.zoomGridY);
+
+            // Hit test
+            if (mouseX >= zRectLeft && mouseX <= zRectRight &&
+                mouseY >= zRectTop && mouseY <= zRectBottom) {
+                // Clicked inside selection -> ZOOM IN
+                this.redraw();
+                return;
+            }
+        }
+
+        // If we didn't click inside an existing zone (or zone wasn't visible), move the zone
+        this.moveZoomToMouse(mouseX, mouseY);
+    }
+
+    // --- NEW METHOD TO CALCULATE GRID POSITION FROM MOUSE ---
+    moveZoomToMouse(mx, my) {
+        const cellWidth = this.width / FRACTAL_GRID_CELLS;
+        const cellHeight = this.height / FRACTAL_GRID_CELLS;
+
+        // 1. Convert pixel coordinate to Grid Coordinate (0 to 8)
+        const gridX = mx / cellWidth;
+
+        // Grid Y is tricky because the class uses a bottom-up logical index (zoomGridY)
+        // but the mouse provides top-down pixel coordinates.
+        // Convert mouse Y to a bottom-up grid value:
+        const gridY = (this.height - my) / cellHeight;
+
+        // 2. Center the Zoom Window (4 cells wide) around the mouse
+        // We subtract half the zoom size (2) from the mouse position
+        let targetGridX = Math.floor(gridX - (ZOOM_GRID_CELLS / 2));
+        let targetGridY = Math.floor(gridY - (ZOOM_GRID_CELLS / 2));
+
+        // 3. Clamp values so the box doesn't go off screen
+        const maxGridIndex = FRACTAL_GRID_CELLS - ZOOM_GRID_CELLS; // 8 - 4 = 4
+
+        if (targetGridX < 0) targetGridX = 0;
+        if (targetGridX > maxGridIndex) targetGridX = maxGridIndex;
+
+        if (targetGridY < 0) targetGridY = 0;
+        if (targetGridY > maxGridIndex) targetGridY = maxGridIndex;
+
+        // 4. Update state and draw
+        this.zoomGridX = targetGridX;
+        this.zoomGridY = targetGridY;
+
+        this.drawZoomZone();
+        this.zoomIsVisible = true;
     }
 
     onKeyDown(evt) {

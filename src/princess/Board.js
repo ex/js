@@ -194,12 +194,46 @@ export default class Board {
         const point = this.getCellUnderMouse(mouseX, mouseY);
 
         if (point) {
+            const index = point.x + this.mWidth * point.y;
+            const clickedItem = this.mTiles[index];
+
+            // --- NEW LOGIC: Move by clicking empty adjacent spot ---
+            if (this.mSelectedPiece && clickedItem === null) {
+                const p = this.mSelectedPiece;
+
+                // Check Left: Clicked X is 1 less than piece column, Y is within piece height
+                if (point.x === p.column - 1 && point.y >= p.row && point.y < p.row + p.height) {
+                    this.moveSelectedPieceLeft();
+                    return; // Stop here so we don't deselect
+                }
+
+                // Check Right: Clicked X is exactly at piece column + width, Y is within piece height
+                if (point.x === p.column + p.width && point.y >= p.row && point.y < p.row + p.height) {
+                    this.moveSelectedPieceRight();
+                    return;
+                }
+
+                // Check Up: Clicked Y is 1 less than piece row, X is within piece width
+                if (point.y === p.row - 1 && point.x >= p.column && point.x < p.column + p.width) {
+                    this.moveSelectedPieceUp();
+                    return;
+                }
+
+                // Check Down: Clicked Y is exactly at piece row + height, X is within piece width
+                if (point.y === p.row + p.height && point.x >= p.column && point.x < p.column + p.width) {
+                    this.moveSelectedPieceDown();
+                    return;
+                }
+            }
+            // -------------------------------------------------------
+
+            // Standard Selection Logic (Clicking on a piece)
             if (this.mSelectedPiece) {
                 // Assuming Piece has a select method
                 if (typeof this.mSelectedPiece.select === 'function') this.mSelectedPiece.select(false);
             }
 
-            this.mSelectedPiece = this.mTiles[point.x + this.mWidth * point.y];
+            this.mSelectedPiece = clickedItem;
 
             if (this.mSelectedPiece) {
                 if (typeof this.mSelectedPiece.select === 'function') this.mSelectedPiece.select(true);
